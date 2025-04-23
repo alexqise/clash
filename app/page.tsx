@@ -1,10 +1,16 @@
+"use client"
+
 import Link from "next/link"
 import Image from "next/image"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Shield, Swords, Trophy, BrainCircuit } from "lucide-react"
+import { Shield, Swords, Trophy, BrainCircuit, Menu, X } from "lucide-react"
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 
 export default function HomePage() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
   return (
     <div className="flex flex-col min-h-screen">
       {/* Header */}
@@ -28,9 +34,31 @@ export default function HomePage() {
               About
             </Link>
           </nav>
-          <Button variant="outline" className="md:hidden bg-transparent border-white text-white hover:bg-blue-800">
-            Menu
-          </Button>
+          
+          {/* Mobile Menu */}
+          <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+            <SheetTrigger asChild>
+              <Button variant="outline" className="md:hidden bg-transparent border-white text-white hover:bg-blue-800">
+                <Menu className="h-5 w-5" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="bg-blue-900 text-white border-none">
+              <div className="flex flex-col gap-6 mt-12">
+                <Link href="/" className="text-lg hover:text-yellow-400 font-medium" onClick={() => setMobileMenuOpen(false)}>
+                  Home
+                </Link>
+                <Link href="/learn" className="text-lg hover:text-yellow-400 font-medium" onClick={() => setMobileMenuOpen(false)}>
+                  Learn
+                </Link>
+                <Link href="/quiz" className="text-lg hover:text-yellow-400 font-medium" onClick={() => setMobileMenuOpen(false)}>
+                  Quiz
+                </Link>
+                <Link href="/about" className="text-lg hover:text-yellow-400 font-medium" onClick={() => setMobileMenuOpen(false)}>
+                  About
+                </Link>
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
       </header>
 
