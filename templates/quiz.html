@@ -1,0 +1,117 @@
+{% extends "base.html" %} {% block title %}Quiz: Question {{ question_id }} -
+Clash Royale Counter Guide{% endblock %} {% block content %}
+<div class="row">
+  <div class="col-12">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+          <a href="{{ url_for('home') }}">Home</a>
+        </li>
+        <li class="breadcrumb-item active">
+          Quiz - Question {{ question_id }}
+        </li>
+      </ol>
+    </nav>
+
+    <div class="progress mb-3">
+      <div
+        class="progress-bar bg-success"
+        role="progressbar"
+        style="width: {{ (question_id / total_questions) * 100 }}%;"
+        aria-valuenow="{{ question_id }}"
+        aria-valuemin="0"
+        aria-valuemax="{{ total_questions }}"
+      >
+        Question {{ question_id }}/{{ total_questions }}
+      </div>
+    </div>
+
+    <div class="card mb-4 shadow">
+      <div class="card-header bg-success text-white">
+        <h2 class="my-2">Quiz: Question {{ question_id }}</h2>
+      </div>
+      <div class="card-body">
+        <form
+          method="POST"
+          id="quiz-form"
+        >
+          <div class="mb-4">
+            <h4 class="mb-3">{{ question.question }}</h4>
+
+            {% for i, option in enumerate(question.options) %}
+            <div class="form-check mb-2">
+              <input
+                class="form-check-input"
+                type="radio"
+                name="answer"
+                id="option{{ i }}"
+                value="{{ i }}"
+                required
+              />
+              <label
+                class="form-check-label"
+                for="option{{ i }}"
+              >
+                {{ option }}
+              </label>
+            </div>
+            {% endfor %}
+          </div>
+
+          <div class="d-flex justify-content-between">
+            {% if question_id > 1 %}
+            <a
+              href="{{ url_for('quiz', question_id=question_id - 1) }}"
+              class="btn btn-outline-secondary"
+            >
+              <i class="bi bi-arrow-left"></i> Previous Question
+            </a>
+            {% else %}
+            <a
+              href="{{ url_for('learn', lesson_id=3) }}"
+              class="btn btn-outline-secondary"
+            >
+              <i class="bi bi-arrow-left"></i> Back to Lessons
+            </a>
+            {% endif %}
+
+            <button
+              type="submit"
+              class="btn btn-success"
+              id="submit-answer"
+            >
+              {% if question_id == total_questions %} Submit Quiz
+              <i class="bi bi-check-circle"></i> {% else %} Next Question
+              <i class="bi bi-arrow-right"></i>
+              {% endif %}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block scripts %}
+<script>
+  // Record user quiz interactions
+  $(document).ready(function () {
+    console.log(
+      "Quiz question {{ question_id }} viewed at: " + new Date().toISOString()
+    );
+
+    // Track answer selection
+    $('input[name="answer"]').change(function () {
+      const selectedOption = $('input[name="answer"]:checked').val();
+      console.log("Selected option: " + selectedOption);
+    });
+
+    // Track form submission
+    $("#quiz-form").submit(function () {
+      const selectedOption = $('input[name="answer"]:checked').val();
+      console.log(
+        "Submitted answer for question {{ question_id }}: " + selectedOption
+      );
+    });
+  });
+</script>
+{% endblock %}
