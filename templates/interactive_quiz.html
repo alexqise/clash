@@ -1,0 +1,36 @@
+<!-- templates/interactive_quiz.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<h2 class="text-xl font-bold mb-4">Interactive Drag-and-Drop Quiz</h2>
+<div class="flex flex-col items-center">
+  <img src="https://i.ytimg.com/vi/fWtaDoOaJQo/maxres2.jpg?sqp=-oaymwEoCIAKENAF8quKqQMcGADwAQH4AbYIgAKAD4oCDAgAEAEYciBBKC8wDw==&rs=AOn4CLBgEI6S_aEFvs564zW-BPu3csun1Q" alt="Quiz Image" class="max-w-xl mb-6">
+
+  <div id="drop-zone" class="border-dashed border-4 border-gray-300 w-full max-w-xl h-32 flex items-center justify-center text-gray-500 mb-6">
+    Drop here
+  </div>
+
+  <div id="draggables" class="flex gap-4">
+    <div draggable="true" class="bg-blue-200 px-4 py-2 rounded cursor-move" ondragstart="dragStart(event)">Item 1</div>
+    <div draggable="true" class="bg-green-200 px-4 py-2 rounded cursor-move" ondragstart="dragStart(event)">Item 2</div>
+    <div draggable="true" class="bg-red-200 px-4 py-2 rounded cursor-move" ondragstart="dragStart(event)">Item 3</div>
+  </div>
+</div>
+
+<script>
+function dragStart(event) {
+  event.dataTransfer.setData("text/plain", event.target.textContent);
+}
+
+document.getElementById("drop-zone").addEventListener("dragover", function (e) {
+  e.preventDefault();
+});
+
+document.getElementById("drop-zone").addEventListener("drop", function (e) {
+  e.preventDefault();
+  const data = e.dataTransfer.getData("text/plain");
+  e.target.innerText = `Dropped: ${data}`;
+});
+</script>
+{% endblock %}
+
