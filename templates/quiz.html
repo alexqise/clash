@@ -105,12 +105,66 @@ Clash Royale Counter Guide{% endblock %} {% block content %}
       console.log("Selected option: " + selectedOption);
     });
 
+    // Track all button interactions with timestamps
+    $("a.btn, button.btn").click(function() {
+      const buttonId = $(this).attr('id') || this.innerText.trim();
+      const timestamp = new Date().toISOString();
+      const selectedOption = $('input[name="answer"]:checked').val();
+
+      // Log interaction locally
+      console.log(`Button "${buttonId}" clicked at: ${timestamp}`);
+
+      // Send interaction data to server
+      fetch('/track_interaction', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          button_id: buttonId,
+          page: 'quiz',
+          context: {
+            question_id: {{ question_id }},
+            total_questions: {{ total_questions }},
+            selected_option: selectedOption || null,
+            is_last_question: {{ 'true' if question_id == total_questions else 'false' }}
+          }
+        })
+      })
+      .then(response => response.json())
+      .then(data => console.log('Server response:', data))
+      .catch(error => console.error('Error tracking interaction:', error));
+    });
+
     // Track form submission
     $("#quiz-form").submit(function () {
       const selectedOption = $('input[name="answer"]:checked').val();
+      const timestamp = new Date().toISOString();
+
       console.log(
         "Submitted answer for question {{ question_id }}: " + selectedOption
       );
+
+      // Send interaction data to server for form submission
+      fetch('/track_interaction', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          button_id: "form_submit",
+          page: 'quiz',
+          context: {
+            question_id: {{ question_id }},
+            total_questions: {{ total_questions }},
+            selected_option: selectedOption,
+            is_last_question: {{ 'true' if question_id == total_questions else 'false' }},
+            timestamp: timestamp
+          }
+        })
+      })
+      .then(response => response.json())
+      .catch(error => console.error('Error tracking form submission:', error));
     });
   });
 </script>

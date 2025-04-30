@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, jsonify
 import datetime
 import json
 
@@ -115,7 +115,8 @@ user_data = {
     'lesson_times': {},
     'quiz_answers': {},
     'quiz_start_time': None,
-    'results': None
+    'results': None,
+    'button_interactions': []  # Store button interaction timestamps
 }
 
 @app.route('/')
@@ -213,6 +214,46 @@ def results():
     user_data['results'] = score
     
     return render_template('results.html', score=score)
+
+@app.route('/track_interaction', methods=['POST'])
+def track_interaction():
+    """
+    Endpoint to track user button interactions with timestamps.
+    Receives:
+    - button_id: ID of the button that was clicked
+    - page: Page where the interaction occurred (learn, quiz)
+    - context: Additional context (e.g., lesson_id, question_id)
+    """
+    if request.method == 'POST':
+        try:
+            data = request.json
+            button_id = data.get('button_id')
+            page = data.get('page')
+            context = data.get('context')
+            
+            # Create interaction record with timestamp
+            interaction = {
+                'timestamp': datetime.datetime.now().isoformat(),
+                'button_id': button_id,
+                'page': page,
+                'context': context
+            }
+            
+            # Store the interaction
+            user_data['button_interactions'].append(interaction)
+            
+            return jsonify({'status': 'success', 'interaction': interaction}), 200
+        except Exception as e:
+            return jsonify({'status': 'error', 'message': str(e)}), 400
+    
+    return jsonify({'status': 'error', 'message': 'Method not allowed'}), 405
+
+@app.route('/interaction_data')
+def interaction_data():
+    """
+    Display all button interaction timestamps for debugging/analysis
+    """
+    return render_template('interaction_data.html', interactions=user_data['button_interactions'])
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000) 

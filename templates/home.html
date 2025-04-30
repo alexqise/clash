@@ -70,22 +70,46 @@ endblock %} {% block content %}
         a quiz. Ready to improve your Clash Royale skills?
       </p>
 
-      <a
-        href="{{ url_for('start') }}"
-        class="btn btn-primary btn-lg px-5"
-        id="start-button"
-      >
-        Start Learning
-      </a>
+      <div class="d-flex justify-content-center mt-3">
+        <a
+          href="{{ url_for('start') }}"
+          class="btn btn-primary btn-lg px-5 me-2"
+          id="start-button"
+        >
+          Start Learning
+        </a>
+      </div>
     </div>
   </div>
 </div>
 {% endblock %} {% block scripts %}
 <script>
-  // Record when the start button is clicked
+  // Record when buttons are clicked
   $(document).ready(function () {
-    $("#start-button").click(function () {
-      console.log("Learning started at: " + new Date().toISOString());
+    $("a.btn").click(function () {
+      const buttonId = $(this).attr("id") || this.innerText.trim();
+      const timestamp = new Date().toISOString();
+
+      // Log interaction locally
+      console.log(`Button "${buttonId}" clicked at: ${timestamp}`);
+
+      // Send interaction data to server
+      fetch("/track_interaction", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          button_id: buttonId,
+          page: "home",
+          context: {
+            timestamp: timestamp,
+          },
+        }),
+      })
+        .then((response) => response.json())
+        .then((data) => console.log("Server response:", data))
+        .catch((error) => console.error("Error tracking interaction:", error));
     });
   });
 </script>
