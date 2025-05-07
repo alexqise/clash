@@ -1,55 +1,101 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<!-- Lesson page content -->
-<div class="card mx-auto" style="max-width: 500px;">
-    <div class="card-body">
-        <h2 class="card-title mb-3" style="font-size:2rem; font-weight:600;">{{ lesson.title }}</h2>
-        <p class="card-text mb-4" style="font-size:1.1rem;">{{ lesson.description }}</p>
-        <!-- Required image -->
-        <img src="{{ lesson.image_url }}" class="img-fluid rounded shadow-sm mb-3" alt="Lesson image" style="max-height:220px; object-fit:contain; background:#f3f4f6;">
-        <!-- Optional GIF/Video placeholder -->
-        {% if lesson.media_placeholders.gif.endswith('.mp4') %}
-        <!-- Render video if URL is mp4 -->
-        <video src="{{ lesson.media_placeholders.gif }}" class="img-fluid rounded shadow-sm mb-3" controls loop muted playsinline style="max-width:100%;height:auto; background:#f3f4f6;">
-            Your browser does not support the video tag.
-        </video>
-        {% else %}
-        <!-- Render image if URL is gif or other -->
-        <img src="{{ lesson.media_placeholders.gif }}" class="img-fluid rounded shadow-sm mb-3" alt="GIF/Video coming soon!" style="max-height:220px; object-fit:contain; background:#f3f4f6;">
+<!-- Ultra-clean, modern Notion-style lesson page: no cards, no borders, just whitespace and blocks -->
+
+<!-- Lesson Title -->
+<h2 class="mb-2 fw-semibold" style="font-size:1.5rem;">{{ lesson.title }}</h2>
+
+<!-- Main Lesson Image: Use Golem, Mega Knight, or other relevant card -->
+{% if lesson.title|lower == 'golem' %}
+  <img src="https://static.wikia.nocookie.net/clashofclans/images/3/3f/Golem.jpeg/revision/latest?cb=20150315220344" alt="Golem" class="img-fluid rounded mb-3" style="max-height:180px; object-fit:contain;">
+{% elif lesson.title|lower == 'mega knight' %}
+  <img src="https://pm1.aminoapps.com/6497/a670c19ba86e56332c2650683bf97adeb66b8597_00.jpg" alt="Mega Knight" class="img-fluid rounded mb-3" style="max-height:180px; object-fit:contain;">
+  <!-- Mega Knight MP3 audio block -->
+  <audio controls class="mb-3 w-100" aria-label="Mega Knight Sound">
+    <source src="https://clash-files.s3.amazonaws.com/mega_knight.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
+{% elif lesson.title|lower == 'elite barbarians' %}
+  <img src="https://static.wikia.nocookie.net/clashroyale/images/e/e8/EliteBarbariansCard.png/revision/latest/thumbnail/width/360/height/450?cb=20171212204714" alt="Elite Barbarians" class="img-fluid rounded mb-3" style="max-height:180px; object-fit:contain;">
+{% else %}
+  <img src="{{ lesson.image_url }}" class="img-fluid rounded mb-3" alt="Lesson image" style="max-height:180px; object-fit:contain;">
+{% endif %}
+
+<!-- Lesson Description -->
+<p class="mb-4 text-secondary" style="font-size:1.05rem;">{{ lesson.description }}</p>
+
+<!-- Optional GIF/Video Block (no border, no shadow) -->
+{% if lesson.media_placeholders.gif.endswith('.mp4') %}
+  <video src="{{ lesson.media_placeholders.gif }}" class="img-fluid rounded mb-3" controls loop muted playsinline style="max-width:100%;height:auto;">
+    Your browser does not support the video tag.
+  </video>
+{% else %}
+  <img src="{{ lesson.media_placeholders.gif }}" class="img-fluid rounded mb-3" alt="GIF/Video coming soon!" style="max-height:180px; object-fit:contain;">
+{% endif %}
+
+<!-- Optional Audio Block -->
+<audio src="{{ lesson.media_placeholders.audio }}" controls class="mb-4 w-100" aria-label="Audio feedback"></audio>
+
+<!-- Section: Counters (show small images for known cards) -->
+<div class="mb-3">
+  <div class="small text-uppercase text-muted mb-1" style="letter-spacing:0.5px; font-size:0.92rem;">Counters</div>
+  <ul class="ps-3 mb-0">
+    {% for counter in lesson.counters %}
+      <li>
+        {% if counter|lower == 'mega knight' %}
+          <img src="https://pm1.aminoapps.com/6497/a670c19ba86e56332c2650683bf97adeb66b8597_00.jpg" alt="Mega Knight" style="height:22px;vertical-align:middle;margin-right:6px;">
+        {% elif counter|lower == 'elite barbarians' %}
+          <img src="https://static.wikia.nocookie.net/clashroyale/images/e/e8/EliteBarbariansCard.png/revision/latest/thumbnail/width/360/height/450?cb=20171212204714" alt="Elite Barbarians" style="height:22px;vertical-align:middle;margin-right:6px;">
+        {% elif counter|lower == 'arrows' %}
+          <img src="https://static.wikia.nocookie.net/clashroyale/images/6/6e/ArrowsCard.png/revision/latest?cb=20171212203258" alt="Arrows" style="height:22px;vertical-align:middle;margin-right:6px;">
+        {% elif counter|lower == 'fireball' %}
+          <img src="https://static.wikia.nocookie.net/clashroyale/images/f/f4/FireballCard.png/revision/latest/thumbnail/width/360/height/450?cb=20171212204724" alt="Fireball" style="height:22px;vertical-align:middle;margin-right:6px;">
+        {% elif counter|lower == 'zap' %}
+          <img src="https://static.wikia.nocookie.net/clashroyale/images/5/52/ZapCard.png/revision/latest?cb=20171212203728" alt="Zap" style="height:22px;vertical-align:middle;margin-right:6px;">
         {% endif %}
-        <!-- Optional Audio placeholder -->
-        <audio src="{{ lesson.media_placeholders.audio }}" controls class="mb-3 w-100" aria-label="Audio feedback"></audio>
-        <hr class="my-4">
-        <strong class="mb-2 d-block">Counters:</strong>
-        <ul class="mb-3 ps-3">
-            {% for counter in lesson.counters %}
-            <li>{{ counter }}</li>
-            {% endfor %}
-        </ul>
-        <strong class="mb-2 d-block">Tips:</strong>
-        <ul class="mb-3 ps-3">
-            {% for tip in lesson.tips %}
-            <li>{{ tip }}</li>
-            {% endfor %}
-        </ul>
-        <!-- Progress bar -->
-        <div class="progress my-4" aria-label="Lesson progress">
-            <div class="progress-bar bg-primary" role="progressbar" style="width: {{ (progress[0] / progress[1]) * 100 }}%;" aria-valuenow="{{ progress[0] }}" aria-valuemin="1" aria-valuemax="{{ progress[1] }}">
-                Lesson {{ progress[0] }} / {{ progress[1] }}
-            </div>
-        </div>
-        <!-- Navigation buttons -->
-        <form method="post" class="d-flex justify-content-between gap-2 mt-2">
-            <button type="submit" name="action" value="prev" class="btn btn-secondary px-4 py-2" aria-label="Previous Lesson" {% if progress[0] == 1 %}disabled{% endif %}>Previous</button>
-            <button type="submit" name="action" value="next" class="btn btn-primary px-4 py-2" aria-label="Next Lesson" {% if progress[0] == progress[1] %}disabled{% endif %}>Next</button>
-        </form>
-        {% if progress[0] == progress[1] %}
-        <!-- Show quiz button only on the last lesson -->
-        <div class="text-center mt-4">
-          <a href="/quiz" class="btn btn-success btn-lg px-5 py-3" aria-label="Go to Quiz">Go to Quiz</a>
-        </div>
-        {% endif %}
-    </div>
+        {{ counter }}
+      </li>
+    {% endfor %}
+  </ul>
 </div>
+
+<!-- Section: Tips (show small images for known cards) -->
+<div class="mb-3">
+  <div class="small text-uppercase text-muted mb-1" style="letter-spacing:0.5px; font-size:0.92rem;">Tips</div>
+  <ul class="ps-3 mb-0">
+    {% for tip in lesson.tips %}
+      <li>
+        {% if 'arrows' in tip|lower %}
+          <img src="https://static.wikia.nocookie.net/clashroyale/images/6/6e/ArrowsCard.png/revision/latest?cb=20171212203258" alt="Arrows" style="height:20px;vertical-align:middle;margin-right:6px;">
+        {% elif 'fireball' in tip|lower %}
+          <img src="https://static.wikia.nocookie.net/clashroyale/images/f/f4/FireballCard.png/revision/latest/thumbnail/width/360/height/450?cb=20171212204724" alt="Fireball" style="height:20px;vertical-align:middle;margin-right:6px;">
+        {% elif 'zap' in tip|lower %}
+          <img src="https://static.wikia.nocookie.net/clashroyale/images/5/52/ZapCard.png/revision/latest?cb=20171212203728" alt="Zap" style="height:20px;vertical-align:middle;margin-right:6px;">
+        {% endif %}
+        {{ tip }}
+      </li>
+    {% endfor %}
+  </ul>
+</div>
+
+<!-- Minimal Progress Bar -->
+<div class="progress my-3" style="height: 0.35rem; background: #ececec;">
+  <div class="progress-bar bg-primary" role="progressbar" style="width: {{ (progress[0] / progress[1]) * 100 }}%;" aria-valuenow="{{ progress[0] }}" aria-valuemin="1" aria-valuemax="{{ progress[1] }}"></div>
+</div>
+<div class="text-end text-muted small mb-2">Lesson {{ progress[0] }} / {{ progress[1] }}</div>
+
+<!-- Navigation Buttons: minimal, flat -->
+<form method="post" class="d-flex justify-content-between gap-2 mt-2">
+  <button type="submit" name="action" value="prev" class="btn btn-link text-secondary px-3 py-2" style="text-decoration:none;" aria-label="Previous Lesson" {% if progress[0] == 1 %}disabled{% endif %}>Previous</button>
+  <button type="submit" name="action" value="next" class="btn btn-link text-primary px-3 py-2" style="text-decoration:none;" aria-label="Next Lesson" {% if progress[0] == progress[1] %}disabled{% endif %}>Next</button>
+</form>
+
+<!-- Go to Quiz Button (only on last lesson) -->
+{% if progress[0] == progress[1] %}
+  <div class="text-center mt-4">
+    <a href="/quiz" class="btn btn-success btn-lg px-5 py-3" aria-label="Go to Quiz">Go to Quiz</a>
+  </div>
+{% endif %}
+
 {% endblock %} 
