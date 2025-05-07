@@ -4,45 +4,45 @@
 <!-- Lesson page content -->
 <div class="card mx-auto" style="max-width: 500px;">
     <div class="card-body">
-        <h2 class="card-title">{{ lesson.title }}</h2>
-        <p class="card-text">{{ lesson.description }}</p>
+        <h2 class="card-title mb-3" style="font-size:2rem; font-weight:600;">{{ lesson.title }}</h2>
+        <p class="card-text mb-4" style="font-size:1.1rem;">{{ lesson.description }}</p>
         <!-- Required image -->
-        <img src="{{ lesson.image_url }}" class="img-fluid mb-2" alt="Lesson image">
+        <img src="{{ lesson.image_url }}" class="img-fluid rounded shadow-sm mb-3" alt="Lesson image" style="max-height:220px; object-fit:contain; background:#f3f4f6;">
         <!-- Optional GIF/Video placeholder -->
         {% if lesson.media_placeholders.gif.endswith('.mp4') %}
         <!-- Render video if URL is mp4 -->
-        <video src="{{ lesson.media_placeholders.gif }}" class="img-fluid mb-2" controls loop muted playsinline style="max-width:100%;height:auto;">
+        <video src="{{ lesson.media_placeholders.gif }}" class="img-fluid rounded shadow-sm mb-3" controls loop muted playsinline style="max-width:100%;height:auto; background:#f3f4f6;">
             Your browser does not support the video tag.
         </video>
         {% else %}
         <!-- Render image if URL is gif or other -->
-        <img src="{{ lesson.media_placeholders.gif }}" class="img-fluid mb-2" alt="GIF/Video coming soon!">
+        <img src="{{ lesson.media_placeholders.gif }}" class="img-fluid rounded shadow-sm mb-3" alt="GIF/Video coming soon!" style="max-height:220px; object-fit:contain; background:#f3f4f6;">
         {% endif %}
         <!-- Optional Audio placeholder -->
-        <audio src="{{ lesson.media_placeholders.audio }}" controls class="mb-2" aria-label="Audio feedback"></audio>
-        <hr>
-        <strong>Counters:</strong>
-        <ul>
+        <audio src="{{ lesson.media_placeholders.audio }}" controls class="mb-3 w-100" aria-label="Audio feedback"></audio>
+        <hr class="my-4">
+        <strong class="mb-2 d-block">Counters:</strong>
+        <ul class="mb-3 ps-3">
             {% for counter in lesson.counters %}
             <li>{{ counter }}</li>
             {% endfor %}
         </ul>
-        <strong>Tips:</strong>
-        <ul>
+        <strong class="mb-2 d-block">Tips:</strong>
+        <ul class="mb-3 ps-3">
             {% for tip in lesson.tips %}
             <li>{{ tip }}</li>
             {% endfor %}
         </ul>
         <!-- Progress bar -->
-        <div class="progress my-3" aria-label="Lesson progress">
-            <div class="progress-bar" role="progressbar" style="width: {{ (progress[0] / progress[1]) * 100 }}%;" aria-valuenow="{{ progress[0] }}" aria-valuemin="1" aria-valuemax="{{ progress[1] }}">
+        <div class="progress my-4" aria-label="Lesson progress">
+            <div class="progress-bar bg-primary" role="progressbar" style="width: {{ (progress[0] / progress[1]) * 100 }}%;" aria-valuenow="{{ progress[0] }}" aria-valuemin="1" aria-valuemax="{{ progress[1] }}">
                 Lesson {{ progress[0] }} / {{ progress[1] }}
             </div>
         </div>
         <!-- Navigation buttons -->
-        <form method="post" class="d-flex justify-content-between">
-            <button type="submit" name="action" value="prev" class="btn btn-secondary" aria-label="Previous Lesson" {% if progress[0] == 1 %}disabled{% endif %}>Previous</button>
-            <button type="submit" name="action" value="next" class="btn btn-primary" aria-label="Next Lesson" {% if progress[0] == progress[1] %}disabled{% endif %}>Next</button>
+        <form method="post" class="d-flex justify-content-between gap-2 mt-2">
+            <button type="submit" name="action" value="prev" class="btn btn-secondary px-4 py-2" aria-label="Previous Lesson" {% if progress[0] == 1 %}disabled{% endif %}>Previous</button>
+            <button type="submit" name="action" value="next" class="btn btn-primary px-4 py-2" aria-label="Next Lesson" {% if progress[0] == progress[1] %}disabled{% endif %}>Next</button>
         </form>
     </div>
 </div>

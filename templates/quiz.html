@@ -4,27 +4,26 @@
 <!-- Quiz page content -->
 <div class="card mx-auto" style="max-width: 500px;">
     <div class="card-body">
-        <h2 class="card-title">Quiz</h2>
-        <p class="fw-bold">{{ question.question }}</p>
-        <!-- Required image -->
+        <h2 class="card-title mb-3" style="font-size:2rem; font-weight:600;">Quiz</h2>
+        <p class="fw-bold mb-4" style="font-size:1.1rem;">{{ question.question }}</p>
         <!-- Optional GIF/Video placeholder -->
         {% if question.media_placeholders.gif.endswith('.mp4') %}
         <!-- Render video if URL is mp4 -->
-        <video src="{{ question.media_placeholders.gif }}" class="img-fluid mb-2" controls loop muted playsinline style="max-width:100%;height:auto;">
+        <video src="{{ question.media_placeholders.gif }}" class="img-fluid rounded shadow-sm mb-3" controls loop muted playsinline style="max-width:100%;height:auto; background:#f3f4f6;">
             Your browser does not support the video tag.
         </video>
         {% else %}
         <!-- Render image if URL is gif or other -->
-        <img src="{{ question.media_placeholders.gif }}" class="img-fluid mb-2" alt="GIF/Video coming soon!">
+        <img src="{{ question.media_placeholders.gif }}" class="img-fluid rounded shadow-sm mb-3" alt="GIF/Video coming soon!" style="max-height:220px; object-fit:contain; background:#f3f4f6;">
         {% endif %}
-        <!-- Audio removed for quiz simplicity -->
+        <hr class="my-4">
         <!-- Answer form -->
         <form method="post">
-            <div class="mb-3">
+            <div class="mb-4">
                 {% for option in question.options %}
-                <div class="form-check">
+                <div class="form-check mb-2">
                     <input class="form-check-input" type="radio" name="option" id="option{{ loop.index0 }}" value="{{ loop.index0 }}" {% if answer == loop.index0 %}checked{% endif %} {% if feedback is not none %}disabled{% endif %}>
-                    <label class="form-check-label" for="option{{ loop.index0 }}">{{ option }}</label>
+                    <label class="form-check-label" for="option{{ loop.index0 }}" style="font-size:1.05rem;">{{ option }}</label>
                 </div>
                 {% endfor %}
             </div>
@@ -35,15 +34,15 @@
                     <div class="alert alert-danger" role="alert">Incorrect. Try to review the lesson!</div>
                 {% endif %}
             {% endif %}
-            <div class="d-flex justify-content-between">
-                <button type="submit" name="action" value="prev" class="btn btn-secondary" aria-label="Previous Question" {% if progress[0] == 1 %}disabled{% endif %}>Previous</button>
-                <button type="submit" name="action" value="answer" class="btn btn-success" aria-label="Submit Answer" {% if feedback is not none %}disabled{% endif %}>Submit</button>
-                <button type="submit" name="action" value="next" class="btn btn-primary" aria-label="Next Question" {% if progress[0] == progress[1] %}disabled{% endif %}>Next</button>
+            <div class="d-flex justify-content-between gap-2 mt-2">
+                <button type="submit" name="action" value="prev" class="btn btn-secondary px-4 py-2" aria-label="Previous Question" {% if progress[0] == 1 %}disabled{% endif %}>Previous</button>
+                <button type="submit" name="action" value="answer" class="btn btn-success px-4 py-2" aria-label="Submit Answer" {% if feedback is not none %}disabled{% endif %}>Submit</button>
+                <button type="submit" name="action" value="next" class="btn btn-primary px-4 py-2" aria-label="Next Question" {% if progress[0] == progress[1] %}disabled{% endif %}>Next</button>
             </div>
         </form>
         <!-- Progress bar -->
-        <div class="progress my-3" aria-label="Quiz progress">
-            <div class="progress-bar" role="progressbar" style="width: {{ (progress[0] / progress[1]) * 100 }}%;" aria-valuenow="{{ progress[0] }}" aria-valuemin="1" aria-valuemax="{{ progress[1] }}">
+        <div class="progress my-4" aria-label="Quiz progress">
+            <div class="progress-bar bg-primary" role="progressbar" style="width: {{ (progress[0] / progress[1]) * 100 }}%;" aria-valuenow="{{ progress[0] }}" aria-valuemin="1" aria-valuemax="{{ progress[1] }}">
                 Question {{ progress[0] }} / {{ progress[1] }}
             </div>
         </div>
