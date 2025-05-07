@@ -48,6 +48,11 @@ def lesson():
     progress = (idx + 1, len(lessons))
     return render_template('lesson.html', lesson=lesson, progress=progress)
 
+@app.route('/certificate')
+def certificate():
+    """Show a certificate of completion after finishing the quiz."""
+    return render_template('certificate.html')
+
 @app.route('/quiz', methods=['GET', 'POST'])
 def quiz():
     """Quiz navigation and answering."""
@@ -68,6 +73,10 @@ def quiz():
                 idx -= 1
             session['quiz_idx'] = idx
             log_interaction(action, quiz_questions[idx]['id'])
+            progress = (idx + 1, len(quiz_questions))  # Ensure progress is defined before use
+            # Redirect to certificate if finished last question
+            if action == 'next' and idx == len(quiz_questions) - 1 and progress[0] == progress[1]:
+                return redirect(url_for('certificate'))
         elif action == 'answer':
             selected = request.form.get('option')
             if selected is not None:
@@ -76,9 +85,9 @@ def quiz():
                 # Provide immediate feedback
                 correct = quiz_questions[idx]['correct_answer_index']
                 feedback = (int(selected) == correct)
+    progress = (idx + 1, len(quiz_questions))  # Always set before rendering
     question = quiz_questions[idx]
     answer = session['quiz_answers'][idx]
-    progress = (idx + 1, len(quiz_questions))
     return render_template('quiz.html', question=question, answer=answer, feedback=feedback, progress=progress)
 
 @app.route('/interactions')

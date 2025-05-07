@@ -1,51 +1,166 @@
-{% extends 'base.html' %}
-
-{% block content %}
+{% extends 'base.html' %} {% block content %}
 <!-- Quiz page content -->
-<div class="card mx-auto" style="max-width: 500px;">
-    <div class="card-body">
-        <h2 class="card-title mb-3" style="font-size:2rem; font-weight:600;">Quiz</h2>
-        <p class="fw-bold mb-4" style="font-size:1.1rem;">{{ question.question }}</p>
-        <!-- Optional GIF/Video placeholder -->
-        {% if question.media_placeholders.gif.endswith('.mp4') %}
-        <!-- Render video if URL is mp4 -->
-        <video src="{{ question.media_placeholders.gif }}" class="img-fluid rounded shadow-sm mb-3" controls loop muted playsinline style="max-width:100%;height:auto; background:#f3f4f6;">
-            Your browser does not support the video tag.
-        </video>
-        {% else %}
-        <!-- Render image if URL is gif or other -->
-        <img src="{{ question.media_placeholders.gif }}" class="img-fluid rounded shadow-sm mb-3" alt="GIF/Video coming soon!" style="max-height:220px; object-fit:contain; background:#f3f4f6;">
-        {% endif %}
-        <hr class="my-4">
-        <!-- Answer form -->
-        <form method="post">
-            <div class="mb-4">
-                {% for option in question.options %}
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="radio" name="option" id="option{{ loop.index0 }}" value="{{ loop.index0 }}" {% if answer == loop.index0 %}checked{% endif %} {% if feedback is not none %}disabled{% endif %}>
-                    <label class="form-check-label" for="option{{ loop.index0 }}" style="font-size:1.05rem;">{{ option }}</label>
-                </div>
-                {% endfor %}
-            </div>
-            {% if feedback is not none %}
-                {% if feedback %}
-                    <div class="alert alert-success" role="alert">Correct! Well done.</div>
-                {% else %}
-                    <div class="alert alert-danger" role="alert">Incorrect. Try to review the lesson!</div>
-                {% endif %}
-            {% endif %}
-            <div class="d-flex justify-content-between gap-2 mt-2">
-                <button type="submit" name="action" value="prev" class="btn btn-secondary px-4 py-2" aria-label="Previous Question" {% if progress[0] == 1 %}disabled{% endif %}>Previous</button>
-                <button type="submit" name="action" value="answer" class="btn btn-success px-4 py-2" aria-label="Submit Answer" {% if feedback is not none %}disabled{% endif %}>Submit</button>
-                <button type="submit" name="action" value="next" class="btn btn-primary px-4 py-2" aria-label="Next Question" {% if progress[0] == progress[1] %}disabled{% endif %}>Next</button>
-            </div>
-        </form>
-        <!-- Progress bar -->
-        <div class="progress my-4" aria-label="Quiz progress">
-            <div class="progress-bar bg-primary" role="progressbar" style="width: {{ (progress[0] / progress[1]) * 100 }}%;" aria-valuenow="{{ progress[0] }}" aria-valuemin="1" aria-valuemax="{{ progress[1] }}">
-                Question {{ progress[0] }} / {{ progress[1] }}
-            </div>
-        </div>
+<div
+  class="card mx-auto"
+  style="max-width: 500px"
+>
+  <div class="card-body">
+    <h2
+      class="card-title mb-3"
+      style="font-size: 2rem; font-weight: 600"
+    >
+      Quiz
+    </h2>
+    <p
+      class="fw-bold mb-4"
+      style="font-size: 1.1rem"
+    >
+      {{ question.question }}
+    </p>
+    <!-- Optional GIF/Video placeholder -->
+    {% if question.media_placeholders.gif.endswith('.mp4') %}
+    <!-- Render video if URL is mp4 -->
+    <video
+      src="{{ question.media_placeholders.gif }}"
+      class="img-fluid rounded shadow-sm mb-3"
+      controls
+      loop
+      muted
+      playsinline
+      style="max-width: 100%; height: auto; background: #f3f4f6"
+    >
+      Your browser does not support the video tag.
+    </video>
+    {% else %}
+    <!-- Render image if URL is gif or other -->
+    <img
+      src="{{ question.media_placeholders.gif }}"
+      class="img-fluid rounded shadow-sm mb-3"
+      alt="GIF/Video coming soon!"
+      style="max-height: 220px; object-fit: contain; background: #f3f4f6"
+    />
+    {% endif %}
+    <hr class="my-4" />
+    <!-- Interactive Board for All Quiz Questions -->
+    <div
+      id="cr-board"
+      class="mb-4 position-relative"
+      style="
+        width: 100%;
+        max-width: 420px;
+        height: 220px;
+        margin: auto;
+        background: #e3e6ed
+          url('https://cdna.artstation.com/p/assets/images/images/065/028/730/large/anit-pednekar-r2.jpg?1689324569')
+          center center/cover no-repeat;
+        border-radius: 16px;
+        box-shadow: 0 2px 8px #0001;
+        overflow: hidden;
+      "
+    >
+      <!-- Glowy drop zone -->
+      <div
+        id="drop-zone"
+        style="
+          position: absolute;
+          left: 170px;
+          top: 80px;
+          width: 80px;
+          height: 80px;
+          border-radius: 50%;
+          background: radial-gradient(circle, #ffe066 60%, #fff0 100%);
+          box-shadow: 0 0 24px 8px #ffe06688;
+          z-index: 2;
+        "
+      ></div>
     </div>
+    <div class="d-flex flex-wrap justify-content-center gap-3 mb-4">
+      {% for card in question.options %}
+      <div
+        class="draggable-card"
+        draggable="true"
+        data-idx="{{ loop.index0 }}"
+        style="width: 80px; cursor: grab"
+      >
+        <img
+          src="/static/images/{{ card|lower|replace(' ','_') }}.png"
+          alt="{{ card }}"
+          class="img-fluid rounded shadow-sm"
+          style="background: #fff; object-fit: contain; max-height: 80px"
+        />
+        <div
+          class="text-center mt-1"
+          style="font-size: 0.95rem; font-weight: 500"
+        >
+          {{ card }}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <div
+      id="drag-feedback"
+      class="mb-3"
+    ></div>
+    <div class="d-flex justify-content-between gap-2 mt-2">
+      <!-- Navigation buttons for quiz -->
+      <form method="post" style="display:inline;">
+        <button type="submit" name="action" value="prev" class="btn btn-secondary px-4 py-2" aria-label="Previous Question" {% if progress[0] == 1 %}disabled{% endif %}>Previous</button>
+      </form>
+      <form method="post" style="display:inline;">
+        <button id="next-btn" type="submit" name="action" value="next" class="btn btn-primary px-4 py-2" aria-label="Next Question" {% if progress[0] == progress[1] %}disabled{% endif %} disabled>Next</button>
+      </form>
+    </div>
+    <script>
+      // Simple drag-and-drop logic for all questions
+      const dropZone = document.getElementById('drop-zone');
+      const cards = document.querySelectorAll('.draggable-card');
+      let correctIdx = {{ question.correct_answer_index }};
+      let feedback = document.getElementById('drag-feedback');
+      let nextBtn = document.getElementById('next-btn');
+      let answeredCorrectly = false;
+      cards.forEach(card => {
+        card.addEventListener('dragstart', e => {
+          e.dataTransfer.setData('text/plain', card.dataset.idx);
+        });
+      });
+      dropZone.addEventListener('dragover', e => {
+        e.preventDefault();
+        dropZone.style.boxShadow = '0 0 32px 16px #ffe066cc';
+      });
+      dropZone.addEventListener('dragleave', e => {
+        dropZone.style.boxShadow = '0 0 24px 8px #ffe06688';
+      });
+      dropZone.addEventListener('drop', e => {
+        e.preventDefault();
+        dropZone.style.boxShadow = '0 0 24px 8px #ffe06688';
+        let idx = parseInt(e.dataTransfer.getData('text/plain'));
+        if(idx === correctIdx) {
+          feedback.innerHTML = '<div class="alert alert-success">Correct!</div>';
+          answeredCorrectly = true;
+          nextBtn.disabled = false;
+        } else {
+          feedback.innerHTML = '<div class="alert alert-danger">Incorrect. Try dragging the correct card!</div>';
+        }
+      });
+      // On page load, keep Next disabled
+      nextBtn.disabled = !answeredCorrectly;
+    </script>
+    <!-- Progress bar -->
+    <div
+      class="progress my-4"
+      aria-label="Quiz progress"
+    >
+      <div
+        class="progress-bar bg-primary"
+        role="progressbar"
+        style="width: {{ (progress[0] / progress[1]) * 100 }}%;"
+        aria-valuenow="{{ progress[0] }}"
+        aria-valuemin="1"
+        aria-valuemax="{{ progress[1] }}"
+      >
+        Question {{ progress[0] }} / {{ progress[1] }}
+      </div>
+    </div>
+  </div>
 </div>
-{% endblock %} 
+{% endblock %}

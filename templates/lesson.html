@@ -44,6 +44,12 @@
             <button type="submit" name="action" value="prev" class="btn btn-secondary px-4 py-2" aria-label="Previous Lesson" {% if progress[0] == 1 %}disabled{% endif %}>Previous</button>
             <button type="submit" name="action" value="next" class="btn btn-primary px-4 py-2" aria-label="Next Lesson" {% if progress[0] == progress[1] %}disabled{% endif %}>Next</button>
         </form>
+        {% if progress[0] == progress[1] %}
+        <!-- Show quiz button only on the last lesson -->
+        <div class="text-center mt-4">
+          <a href="/quiz" class="btn btn-success btn-lg px-5 py-3" aria-label="Go to Quiz">Go to Quiz</a>
+        </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %} 
