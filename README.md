@@ -1,41 +1,48 @@
 # Clash Royale Learning App
 
-A Flask-based web application for learning about Clash Royale win conditions and their counters.
+## Overview
+
+An interactive web app to teach Clash Royale win conditions and counters using short lessons and quizzes with media. Built with Flask, Bootstrap 5, and Jinja2. All user progress and logs are stored in session (no database).
 
 ## Features
 
-- Interactive lessons about Clash Royale win conditions
-- Quiz to test your knowledge
-- Session-based user progress tracking
+- Interactive lessons with images and media placeholders
+- Multiple-choice quizzes with instant feedback
+- Progress and answers persist on refresh
+- All user actions logged and viewable
+- Responsive, accessible UI (desktop/mobile)
 
-## Setup and Installation
+## Setup
 
-1. Clone the repository
-2. Install dependencies:
+1. Clone the repo:
+   ```sh
+   git clone <repo-url>
+   cd clash
    ```
+2. Install dependencies:
+   ```sh
    pip install -r requirements.txt
    ```
-3. Run the application:
+3. Run the app:
+   ```sh
+   flask run
    ```
-   python app.py
-   ```
-4. Access the application at http://localhost:5000
+4. Open [http://localhost:5000](http://localhost:5000) in your browser.
 
-## Development
+## Testing
 
-### Environment Variables
-
-- `SECRET_KEY`: Flask session encryption key (defaults to a development key if not set)
+- Navigate through lessons and quizzes.
+- Refresh the page to verify progress persists.
+- View your interaction log from the menu.
 
 ## Project Structure
 
-- `app.py`: Main Flask application
-- `templates/`: HTML templates
-- `static/`: Static assets (CSS, JavaScript, images)
+- `app.py` — Main Flask app and routes
+- `lessons.py` — Lesson data
+- `quizzes.py` — Quiz data
+- `templates/` — HTML templates
+- `static/` — Images, GIFs, audio placeholders
 
-## Future Improvements
+---
 
-- Database integration for persistent user data
-- More lessons and quiz questions
-- User authentication system
-- Improved UI/UX
+For more details, see the project spec in `Clash Royale App Specs.md`.

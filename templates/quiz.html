@@ -1,171 +1,46 @@
-{% extends "base.html" %} {% block title %}Quiz: Question {{ question_id }} -
-Clash Royale Counter Guide{% endblock %} {% block content %}
-<div class="row">
-  <div class="col-12">
-    <nav aria-label="breadcrumb">
-      <ol class="breadcrumb">
-        <li class="breadcrumb-item">
-          <a href="{{ url_for('home') }}">Home</a>
-        </li>
-        <li class="breadcrumb-item active">
-          Quiz - Question {{ question_id }}
-        </li>
-      </ol>
-    </nav>
+{% extends 'base.html' %}
 
-    <div class="progress mb-3">
-      <div
-        class="progress-bar bg-success"
-        role="progressbar"
-        style="width: {{ (question_id / total_questions) * 100 }}%;"
-        aria-valuenow="{{ question_id }}"
-        aria-valuemin="0"
-        aria-valuemax="{{ total_questions }}"
-      >
-        Question {{ question_id }}/{{ total_questions }}
-      </div>
-    </div>
-
-    <div class="card mb-4 shadow">
-      <div class="card-header bg-success text-white">
-        <h2 class="my-2">Quiz: Question {{ question_id }}</h2>
-      </div>
-      <div class="card-body">
-        <form
-          method="POST"
-          id="quiz-form"
-        >
-          <div class="mb-4">
-            <h4 class="mb-3">{{ question.question }}</h4>
-
-            {% for option in question.options %}
-            <div class="form-check mb-2">
-              <input
-                class="form-check-input"
-                type="radio"
-                name="answer"
-                id="option{{ loop.index0 }}"
-                value="{{ loop.index0 }}"
-                required
-              />
-              <label
-                class="form-check-label"
-                for="option{{ loop.index0 }}"
-              >
-                {{ option }}
-              </label>
+{% block content %}
+<!-- Quiz page content -->
+<div class="card mx-auto" style="max-width: 500px;">
+    <div class="card-body">
+        <h2 class="card-title">Quiz</h2>
+        <p class="fw-bold">{{ question.question }}</p>
+        <!-- Required image -->
+        <img src="{{ question.media_placeholders.image }}" class="img-fluid mb-2" alt="Quiz image">
+        <!-- Optional GIF/Video placeholder -->
+        <img src="{{ question.media_placeholders.gif }}" class="img-fluid mb-2" alt="GIF/Video coming soon!">
+        <!-- Optional Audio placeholder -->
+        <audio src="{{ question.media_placeholders.audio }}" controls class="mb-2" aria-label="Audio feedback"></audio>
+        <!-- Answer form -->
+        <form method="post">
+            <div class="mb-3">
+                {% for option in question.options %}
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="option" id="option{{ loop.index0 }}" value="{{ loop.index0 }}" {% if answer == loop.index0 %}checked{% endif %} {% if feedback is not none %}disabled{% endif %}>
+                    <label class="form-check-label" for="option{{ loop.index0 }}">{{ option }}</label>
+                </div>
+                {% endfor %}
             </div>
-            {% endfor %}
-          </div>
-
-          <div class="d-flex justify-content-between">
-            {% if question_id > 1 %}
-            <a
-              href="{{ url_for('quiz', question_id=question_id - 1) }}"
-              class="btn btn-outline-secondary"
-            >
-              <i class="bi bi-arrow-left"></i> Previous Question
-            </a>
-            {% else %}
-            <a
-              href="{{ url_for('learn', lesson_id=3) }}"
-              class="btn btn-outline-secondary"
-            >
-              <i class="bi bi-arrow-left"></i> Back to Lessons
-            </a>
+            {% if feedback is not none %}
+                {% if feedback %}
+                    <div class="alert alert-success" role="alert">Correct! Well done.</div>
+                {% else %}
+                    <div class="alert alert-danger" role="alert">Incorrect. Try to review the lesson!</div>
+                {% endif %}
             {% endif %}
-
-            <button
-              type="submit"
-              class="btn btn-success"
-              id="submit-answer"
-            >
-              {% if question_id == total_questions %} Submit Quiz
-              <i class="bi bi-check-circle"></i> {% else %} Next Question
-              <i class="bi bi-arrow-right"></i>
-              {% endif %}
-            </button>
-          </div>
+            <div class="d-flex justify-content-between">
+                <button type="submit" name="action" value="prev" class="btn btn-secondary" aria-label="Previous Question" {% if progress[0] == 1 %}disabled{% endif %}>Previous</button>
+                <button type="submit" name="action" value="answer" class="btn btn-success" aria-label="Submit Answer" {% if feedback is not none %}disabled{% endif %}>Submit</button>
+                <button type="submit" name="action" value="next" class="btn btn-primary" aria-label="Next Question" {% if progress[0] == progress[1] %}disabled{% endif %}>Next</button>
+            </div>
         </form>
-      </div>
+        <!-- Progress bar -->
+        <div class="progress my-3" aria-label="Quiz progress">
+            <div class="progress-bar" role="progressbar" style="width: {{ (progress[0] / progress[1]) * 100 }}%;" aria-valuenow="{{ progress[0] }}" aria-valuemin="1" aria-valuemax="{{ progress[1] }}">
+                Question {{ progress[0] }} / {{ progress[1] }}
+            </div>
+        </div>
     </div>
-  </div>
 </div>
-{% endblock %} {% block scripts %}
-<script>
-  // Record user quiz interactions
-  $(document).ready(function () {
-    console.log(
-      "Quiz question {{ question_id }} viewed at: " + new Date().toISOString()
-    );
-
-    // Track answer selection
-    $('input[name="answer"]').change(function () {
-      const selectedOption = $('input[name="answer"]:checked').val();
-      console.log("Selected option: " + selectedOption);
-    });
-
-    // Track all button interactions with timestamps
-    $("a.btn, button.btn").click(function() {
-      const buttonId = $(this).attr('id') || this.innerText.trim();
-      const timestamp = new Date().toISOString();
-      const selectedOption = $('input[name="answer"]:checked').val();
-
-      // Log interaction locally
-      console.log(`Button "${buttonId}" clicked at: ${timestamp}`);
-
-      // Send interaction data to server
-      fetch('/track_interaction', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          button_id: buttonId,
-          page: 'quiz',
-          context: {
-            question_id: {{ question_id }},
-            total_questions: {{ total_questions }},
-            selected_option: selectedOption || null,
-            is_last_question: {{ 'true' if question_id == total_questions else 'false' }}
-          }
-        })
-      })
-      .then(response => response.json())
-      .then(data => console.log('Server response:', data))
-      .catch(error => console.error('Error tracking interaction:', error));
-    });
-
-    // Track form submission
-    $("#quiz-form").submit(function () {
-      const selectedOption = $('input[name="answer"]:checked').val();
-      const timestamp = new Date().toISOString();
-
-      console.log(
-        "Submitted answer for question {{ question_id }}: " + selectedOption
-      );
-
-      // Send interaction data to server for form submission
-      fetch('/track_interaction', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          button_id: "form_submit",
-          page: 'quiz',
-          context: {
-            question_id: {{ question_id }},
-            total_questions: {{ total_questions }},
-            selected_option: selectedOption,
-            is_last_question: {{ 'true' if question_id == total_questions else 'false' }},
-            timestamp: timestamp
-          }
-        })
-      })
-      .then(response => response.json())
-      .catch(error => console.error('Error tracking form submission:', error));
-    });
-  });
-</script>
-{% endblock %}
+{% endblock %} 

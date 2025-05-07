@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- Lesson page content -->
+<div class="card mx-auto" style="max-width: 500px;">
+    <div class="card-body">
+        <h2 class="card-title">{{ lesson.title }}</h2>
+        <p class="card-text">{{ lesson.description }}</p>
+        <!-- Required image -->
+        <img src="{{ lesson.image_url }}" class="img-fluid mb-2" alt="Lesson image">
+        <!-- Optional GIF/Video placeholder -->
+        <img src="{{ lesson.media_placeholders.gif }}" class="img-fluid mb-2" alt="GIF/Video coming soon!">
+        <!-- Optional Audio placeholder -->
+        <audio src="{{ lesson.media_placeholders.audio }}" controls class="mb-2" aria-label="Audio feedback"></audio>
+        <hr>
+        <strong>Counters:</strong>
+        <ul>
+            {% for counter in lesson.counters %}
+            <li>{{ counter }}</li>
+            {% endfor %}
+        </ul>
+        <strong>Tips:</strong>
+        <ul>
+            {% for tip in lesson.tips %}
+            <li>{{ tip }}</li>
+            {% endfor %}
+        </ul>
+        <!-- Progress bar -->
+        <div class="progress my-3" aria-label="Lesson progress">
+            <div class="progress-bar" role="progressbar" style="width: {{ (progress[0] / progress[1]) * 100 }}%;" aria-valuenow="{{ progress[0] }}" aria-valuemin="1" aria-valuemax="{{ progress[1] }}">
+                Lesson {{ progress[0] }} / {{ progress[1] }}
+            </div>
+        </div>
+        <!-- Navigation buttons -->
+        <form method="post" class="d-flex justify-content-between">
+            <button type="submit" name="action" value="prev" class="btn btn-secondary" aria-label="Previous Lesson" {% if progress[0] == 1 %}disabled{% endif %}>Previous</button>
+            <button type="submit" name="action" value="next" class="btn btn-primary" aria-label="Next Lesson" {% if progress[0] == progress[1] %}disabled{% endif %}>Next</button>
+        </form>
+    </div>
+</div>
+{% endblock %} 
