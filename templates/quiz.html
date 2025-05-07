@@ -7,11 +7,17 @@
         <h2 class="card-title">Quiz</h2>
         <p class="fw-bold">{{ question.question }}</p>
         <!-- Required image -->
-        <img src="{{ question.media_placeholders.image }}" class="img-fluid mb-2" alt="Quiz image">
         <!-- Optional GIF/Video placeholder -->
+        {% if question.media_placeholders.gif.endswith('.mp4') %}
+        <!-- Render video if URL is mp4 -->
+        <video src="{{ question.media_placeholders.gif }}" class="img-fluid mb-2" controls loop muted playsinline style="max-width:100%;height:auto;">
+            Your browser does not support the video tag.
+        </video>
+        {% else %}
+        <!-- Render image if URL is gif or other -->
         <img src="{{ question.media_placeholders.gif }}" class="img-fluid mb-2" alt="GIF/Video coming soon!">
-        <!-- Optional Audio placeholder -->
-        <audio src="{{ question.media_placeholders.audio }}" controls class="mb-2" aria-label="Audio feedback"></audio>
+        {% endif %}
+        <!-- Audio removed for quiz simplicity -->
         <!-- Answer form -->
         <form method="post">
             <div class="mb-3">

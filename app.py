@@ -53,7 +53,8 @@ def quiz():
     """Quiz navigation and answering."""
     if 'quiz_idx' not in session:
         session['quiz_idx'] = 0
-    if 'quiz_answers' not in session:
+    # Ensure quiz_answers always matches the number of quiz questions
+    if 'quiz_answers' not in session or len(session['quiz_answers']) != len(quiz_questions):
         session['quiz_answers'] = [None] * len(quiz_questions)
     idx = session['quiz_idx']
     feedback = None

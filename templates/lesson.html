@@ -9,7 +9,15 @@
         <!-- Required image -->
         <img src="{{ lesson.image_url }}" class="img-fluid mb-2" alt="Lesson image">
         <!-- Optional GIF/Video placeholder -->
+        {% if lesson.media_placeholders.gif.endswith('.mp4') %}
+        <!-- Render video if URL is mp4 -->
+        <video src="{{ lesson.media_placeholders.gif }}" class="img-fluid mb-2" controls loop muted playsinline style="max-width:100%;height:auto;">
+            Your browser does not support the video tag.
+        </video>
+        {% else %}
+        <!-- Render image if URL is gif or other -->
         <img src="{{ lesson.media_placeholders.gif }}" class="img-fluid mb-2" alt="GIF/Video coming soon!">
+        {% endif %}
         <!-- Optional Audio placeholder -->
         <audio src="{{ lesson.media_placeholders.audio }}" controls class="mb-2" aria-label="Audio feedback"></audio>
         <hr>
