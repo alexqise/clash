@@ -33,7 +33,7 @@ lessons = [
         'id': 3,
         'title': 'Mega Knight',
         'description': 'The Mega Knight is a high-cost, high-health troop that deals area damage and has a unique spawn jump. Best deployed defensively to counter swarms and then used in a counterpush.',
-        'image_url': 'https://static.wikia.nocookie.net/clashroyale/images/e/e4/MegaKnightCard.png',
+        'image_url': '/static/images/mega_knight.png',
         'media_placeholders': {
             'gif': 'https://media.tenor.com/PzU0RE1aOXUAAAAC/mega-knight.gif',
             'audio': '/static/placeholder.mp3',
@@ -45,7 +45,7 @@ lessons = [
         'id': 4,
         'title': 'Golem',
         'description': 'The Golem is a slow, ground-based tank with massive health. Upon death, it splits into two Golemites. Best used behind your towers to build a strong push.',
-        'image_url': 'https://static.wikia.nocookie.net/clashroyale/images/0/02/GolemCard.png',
+        'image_url': '/static/images/golem.png',
         'media_placeholders': {
             'gif': 'https://media.tenor.com/O8zMefXUQHIAAAAC/golem-clash-royale.gif',
             'audio': '/static/placeholder.mp3',
@@ -57,7 +57,7 @@ lessons = [
         'id': 5,
         'title': 'Lava Hound',
         'description': 'The Lava Hound is a flying tank that targets buildings. Upon death, it bursts into several Lava Pups that deal chip damage.',
-        'image_url': 'https://static.wikia.nocookie.net/clashroyale/images/2/29/LavaHoundCard.png',
+        'image_url': '/static/images/lava_hound.png',
         'media_placeholders': {
             'gif': 'https://media.tenor.com/Mbwa-EAyAakAAAAC/lava-hound.gif',
             'audio': '/static/placeholder.mp3',
@@ -69,7 +69,7 @@ lessons = [
         'id': 6,
         'title': 'Elite Barbarians',
         'description': 'Elite Barbarians are a fast, high-damage pair of melee units. They can shred through low-health troops and towers if left unchecked.',
-        'image_url': 'https://static.wikia.nocookie.net/clashroyale/images/4/48/EliteBarbariansCard.png',
+        'image_url': '/static/images/elite_barbarians.png',
         'media_placeholders': {
             'gif': 'https://media.tenor.com/LnJJM1CyaQ8AAAAC/elite-barbarians-clash-royale.gif',
             'audio': '/static/placeholder.mp3',
