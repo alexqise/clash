@@ -7,9 +7,9 @@ lessons = [
         'id': 1,
         'title': 'What is a Win Condition?',
         'description': 'A win condition is a card or strategy that can deal significant damage to enemy towers. Learning to use and counter them is key to victory.',
-        'image_url': '/static/images/win_condition_example.jpg',
+        'image_url': './static/images/win_condition.jpg',
         'media_placeholders': {
-            'gif': '/static/placeholder.gif',
+            'gif': 'https://media1.tenor.com/m/qy5YiCOqz0oAAAAC/clash-royale.gif',
             'audio': '/static/placeholder.mp3',
         },
         'counters': ['Building placement', 'Cheap cycle cards'],
@@ -77,4 +77,4 @@ lessons = [
         'counters': ['P.E.K.K.A', 'Mini P.E.K.K.A', 'Fireball', 'Valkyrie', 'Skeleton Army'],
         'tips': ['Use high-damage or splash units to stop Elite Barbarians.'],
     },
-] 
+]
