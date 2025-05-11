@@ -26,16 +26,20 @@
 <p class="mb-4 text-secondary" style="font-size:1.05rem;">{{ lesson.description }}</p>
 
 <!-- Optional GIF/Video Block (no border, no shadow) -->
-{% if lesson.media_placeholders.gif.endswith('.mp4') %}
-  <video src="{{ lesson.media_placeholders.gif }}" class="img-fluid rounded mb-3" controls loop muted playsinline style="max-width:100%;height:auto;">
-    Your browser does not support the video tag.
-  </video>
-{% else %}
-  <img src="{{ lesson.media_placeholders.gif }}" class="img-fluid rounded mb-3" alt="GIF/Video coming soon!" style="max-height:180px; object-fit:contain;">
+{% if lesson.media_placeholders.gif != '/static/placeholder.gif' %}
+  {% if lesson.media_placeholders.gif.endswith('.mp4') %}
+    <video src="{{ lesson.media_placeholders.gif }}" class="img-fluid rounded mb-3" controls loop muted playsinline style="max-width:100%;height:auto;">
+      Your browser does not support the video tag.
+    </video>
+  {% else %}
+    <img src="{{ lesson.media_placeholders.gif }}" class="img-fluid rounded mb-3" alt="GIF/Video coming soon!" style="max-height:180px; object-fit:contain;">
+  {% endif %}
 {% endif %}
 
 <!-- Optional Audio Block -->
+{% if lesson.media_placeholders.audio != '/static/placeholder.mp3' %}
 <audio src="{{ lesson.media_placeholders.audio }}" controls class="mb-4 w-100" aria-label="Audio feedback"></audio>
+{% endif %}
 
 <!-- Section: Counters (show small images for known cards) -->
 <div class="mb-3">

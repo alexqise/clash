@@ -7,7 +7,7 @@ lessons = [
         'id': 1,
         'title': 'What is a Win Condition?',
         'description': 'A win condition is a card or strategy that can deal significant damage to enemy towers. Learning to use and counter them is key to victory.',
-        'image_url': '/static/images/win_condition_example.jpg',
+        'image_url': '/static/images/elite_barbarians.png',
         'media_placeholders': {
             'gif': '/static/placeholder.gif',
             'audio': '/static/placeholder.mp3',
