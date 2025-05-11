@@ -37,6 +37,30 @@ def home():
     return render_template('home.html')
 
 
+@app.route('/play')
+def play():
+    """Interactive Clash Royale game simulation with cards from lessons."""
+    # Get all unique cards from lessons
+    cards = set()
+    counters = set()
+
+    for lesson in lessons:
+        counters.update(lesson['counters'])
+
+    # Add commonly used cards
+    cards = list(counters)
+    cards.extend(['Hog Rider', 'Mega Knight', 'Golem',
+                 'Lava Hound', 'Elite Barbarians'])
+
+    # Remove duplicates while preserving order
+    unique_cards = []
+    for card in cards:
+        if card not in unique_cards:
+            unique_cards.append(card)
+
+    return render_template('play.html', cards=unique_cards)
+
+
 @app.route('/lesson', methods=['GET', 'POST'])
 def lesson():
     """Lesson navigation and display."""
