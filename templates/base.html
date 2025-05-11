@@ -6,71 +6,194 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0"
     />
-    <title>{% block title %}Clash Royale Counter Guide{% endblock %}</title>
-
-    <!-- Bootstrap CSS -->
+    <title>Clash Royale Learning App</title>
+    <!-- Bootstrap 5 CDN -->
     <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
-
-    <!-- Custom CSS -->
+    <!-- Google Fonts for modern look -->
     <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap"
       rel="stylesheet"
-      href="{{ url_for('static', filename='css/style.css') }}"
     />
-
-    <!-- Favicon -->
-    <link
-      rel="icon"
-      href="https://cdn.royaleapi.com/static/img/favicon/favicon.ico"
-      type="image/x-icon"
-    />
+    <style>
+      body {
+        background: #f8fafc;
+        font-family: "Inter", Arial, sans-serif;
+        min-height: 100vh;
+      }
+      /* Sidebar styles */
+      .notion-sidebar {
+        width: 220px;
+        min-height: 100vh;
+        background: #fff;
+        border-right: 1px solid #e5e7eb;
+        box-shadow: 2px 0 8px rgba(0, 0, 0, 0.03);
+        position: fixed;
+        top: 0;
+        left: 0;
+        padding: 32px 0 0 0;
+        z-index: 100;
+        transition: width 0.2s;
+        overflow-x: hidden;
+      }
+      .notion-sidebar .nav-link {
+        color: #222;
+        font-weight: 500;
+        border-radius: 8px;
+        margin: 4px 16px;
+        padding: 10px 16px;
+        transition: background 0.15s, color 0.15s;
+        white-space: nowrap;
+      }
+      .notion-sidebar .nav-link.active,
+      .notion-sidebar .nav-link:hover {
+        background: #f1f5f9;
+        color: #0d6efd;
+      }
+      /* Collapsed sidebar styles */
+      .sidebar-collapsed .notion-sidebar {
+        width: 56px;
+        padding-left: 0;
+        padding-right: 0;
+      }
+      .sidebar-collapsed .notion-sidebar .nav-link {
+        text-align: center;
+        padding: 10px 0;
+        margin: 4px 0;
+        font-size: 1.2rem;
+      }
+      .sidebar-collapsed .notion-sidebar .sidebar-title,
+      .sidebar-collapsed .notion-sidebar .nav-link span {
+        display: none !important;
+      }
+      /* Topbar styles */
+      .notion-topbar {
+        margin-left: 220px;
+        height: 56px;
+        background: #fff;
+        border-bottom: 1px solid #e5e7eb;
+        display: flex;
+        align-items: center;
+        padding: 0 32px;
+        font-size: 1.25rem;
+        font-weight: 600;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+        transition: margin-left 0.2s;
+      }
+      .sidebar-collapsed .notion-topbar {
+        margin-left: 56px;
+      }
+      /* Hamburger button styles */
+      .sidebar-toggle-btn {
+        background: none;
+        border: none;
+        font-size: 1.6rem;
+        margin-right: 18px;
+        color: #222;
+        cursor: pointer;
+        outline: none;
+        display: flex;
+        align-items: center;
+      }
+      .sidebar-toggle-btn:focus {
+        color: #0d6efd;
+      }
+      /* Main content area */
+      .notion-content {
+        margin-left: 220px;
+        margin-top: 56px;
+        padding: 40px 0;
+        min-height: calc(100vh - 56px);
+        background: #f8fafc;
+        transition: margin-left 0.2s;
+      }
+      .sidebar-collapsed .notion-content {
+        margin-left: 56px;
+      }
+      .notion-card {
+        background: #fff;
+        border-radius: 18px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.07);
+        padding: 32px 32px;
+        max-width: 800px;
+        margin: 0 auto;
+      }
+    </style>
   </head>
-  <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-      <div class="container">
-        <a
-          class="navbar-brand"
-          href="{{ url_for('home') }}"
-        >
-          <img
-            src="https://cdn.royaleapi.com/static/img/branding/royaleapi-logo.png"
-            alt="Clash Royale"
-            height="30"
-          />
-          Counter Guide
-        </a>
+  <body class="sidebar-collapsed">
+    <!-- Notion-style sidebar navigation -->
+    <nav class="notion-sidebar d-flex flex-column">
+      <div
+        class="sidebar-title mb-4 ps-4"
+        style="font-size: 1.3rem; font-weight: 700; letter-spacing: -1px"
+      >
+        Clash Royale App
       </div>
+      <a
+        class="nav-link {% if request.path == '/' %}active{% endif %}"
+        href="/"
+      >
+        <span class="me-2"><i class="bi bi-house"></i></span><span>Home</span>
+      </a>
+      <a
+        class="nav-link {% if request.path.startswith('/lesson') %}active{% endif %}"
+        href="/lesson"
+      >
+        <span class="me-2"><i class="bi bi-journal-text"></i></span
+        ><span>Lessons</span>
+      </a>
+      <a
+        class="nav-link {% if request.path.startswith('/quiz') %}active{% endif %}"
+        href="/quiz"
+      >
+        <span class="me-2"><i class="bi bi-question-circle"></i></span
+        ><span>Quiz</span>
+      </a>
+      <a
+        class="nav-link {% if request.path.startswith('/interactions') %}active{% endif %}"
+        href="/interactions"
+      >
+        <span class="me-2"><i class="bi bi-bar-chart"></i></span
+        ><span>Interactions</span>
+      </a>
     </nav>
-
-    <div class="container mt-4">
-      <div class="row">
-        <div class="col-md-10 mx-auto">{% block content %}{% endblock %}</div>
+    <!-- Notion-style top bar with sidebar toggle button -->
+    <div class="notion-topbar d-flex align-items-center">
+      <button
+        class="sidebar-toggle-btn"
+        id="sidebarToggle"
+        aria-label="Toggle sidebar"
+        type="button"
+      >
+        <!-- Hamburger icon -->
+        <span id="sidebarHamburger">&#9776;</span>
+      </button>
+      <span>Clash Royale Learning App</span>
+    </div>
+    <!-- Main content area -->
+    <div class="notion-content">
+      <div class="notion-card">
+        {% block content %}{% endblock %}
+        <!-- Reminder: After finishing lessons, proceed to the quiz for best learning! -->
       </div>
     </div>
-
-    <footer class="bg-dark text-white text-center py-3 mt-5">
-      <div class="container">
-        <p class="mb-0">
-          Clash Royale Counter Guide - Learn to counter win conditions
-        </p>
-        <small
-          >Created for educational purposes. Not affiliated with
-          Supercell.</small
-        >
-      </div>
-    </footer>
-
-    <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-    <!-- Bootstrap JS Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-
-    <!-- Custom JavaScript -->
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
-
-    {% block scripts %}{% endblock %}
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Bootstrap Icons CDN for sidebar icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+    />
+    <!-- Sidebar toggle script -->
+    <script>
+      // Toggle sidebar collapsed state
+      document
+        .getElementById("sidebarToggle")
+        .addEventListener("click", function () {
+          document.body.classList.toggle("sidebar-collapsed");
+        });
+    </script>
   </body>
 </html>

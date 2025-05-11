@@ -1,0 +1,25 @@
+{% extends 'base.html' %} {% block content %}
+<!-- Interactions log page -->
+<h2>Interaction Log</h2>
+<p>Total Clicks: <strong>{{ total_clicks }}</strong></p>
+<p>Unique Buttons Pressed: <strong>{{ unique_buttons }}</strong></p>
+<p>Pages Visited: <strong>{{ pages_visited }}</strong></p>
+<table class="table table-striped mt-3">
+  <thead>
+    <tr>
+      <th>Timestamp</th>
+      <th>Button</th>
+      <th>Context (ID)</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for log in logs %}
+    <tr>
+      <td>{{ log.timestamp }}</td>
+      <td>{{ log.button }}</td>
+      <td>{{ log.context }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

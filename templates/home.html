@@ -1,116 +1,16 @@
-{% extends "base.html" %} {% block title %}Home - Clash Royale Counter Guide{%
-endblock %} {% block content %}
+{% extends 'base.html' %} {% block content %}
+<!-- Home page content -->
 <div class="text-center">
-  <h1 class="display-4 mb-4">Clash Royale Counter Guide</h1>
-
-  <div class="card shadow-lg mb-5">
-    <div class="card-body p-5">
-      <img
-        src="https://cdn.royaleapi.com/static/img/cr-logo.png"
-        alt="Clash Royale Logo"
-        class="img-fluid mb-4"
-        style="max-width: 200px"
-      />
-
-      <h2 class="mb-3">Master Win Condition Counters</h2>
-      <p class="lead mb-4">
-        Learn how to effectively counter popular win conditions in Clash Royale.
-        This guide will teach you strategies to defend against Hog Rider,
-        Balloon, and Golem.
-      </p>
-
-      <div class="mb-4">
-        <div class="d-flex justify-content-center">
-          <div class="card-deck">
-            <div
-              class="card bg-light mx-2"
-              style="max-width: 10rem"
-            >
-              <img
-                src="https://cdn.royaleapi.com/static/img/cards-75/hog-rider.png"
-                class="card-img-top p-2"
-                alt="Hog Rider"
-              />
-              <div class="card-body text-center p-2">
-                <h6 class="card-title">Hog Rider</h6>
-              </div>
-            </div>
-            <div
-              class="card bg-light mx-2"
-              style="max-width: 10rem"
-            >
-              <img
-                src="https://cdn.royaleapi.com/static/img/cards-75/balloon.png"
-                class="card-img-top p-2"
-                alt="Balloon"
-              />
-              <div class="card-body text-center p-2">
-                <h6 class="card-title">Balloon</h6>
-              </div>
-            </div>
-            <div
-              class="card bg-light mx-2"
-              style="max-width: 10rem"
-            >
-              <img
-                src="https://cdn.royaleapi.com/static/img/cards-75/golem.png"
-                class="card-img-top p-2"
-                alt="Golem"
-              />
-              <div class="card-body text-center p-2">
-                <h6 class="card-title">Golem</h6>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <p class="mb-4">
-        After completing the lessons, you'll be able to test your knowledge with
-        a quiz. Ready to improve your Clash Royale skills?
-      </p>
-
-      <div class="d-flex justify-content-center mt-3">
-        <a
-          href="{{ url_for('start') }}"
-          class="btn btn-primary btn-lg px-5 me-2"
-          id="start-button"
-        >
-          Start Learning
-        </a>
-      </div>
-    </div>
-  </div>
+  <h1>Welcome to the Clash Royale Learning App!</h1>
+  <p>
+    Learn about win conditions, counters, and test your knowledge with
+    interactive lessons and quizzes.
+  </p>
+  <a
+    href="/lesson"
+    class="btn btn-primary btn-lg mt-3"
+    aria-label="Start Learning"
+    >Start Learning</a
+  >
 </div>
-{% endblock %} {% block scripts %}
-<script>
-  // Record when buttons are clicked
-  $(document).ready(function () {
-    $("a.btn").click(function () {
-      const buttonId = $(this).attr("id") || this.innerText.trim();
-      const timestamp = new Date().toISOString();
-
-      // Log interaction locally
-      console.log(`Button "${buttonId}" clicked at: ${timestamp}`);
-
-      // Send interaction data to server
-      fetch("/track_interaction", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          button_id: buttonId,
-          page: "home",
-          context: {
-            timestamp: timestamp,
-          },
-        }),
-      })
-        .then((response) => response.json())
-        .then((data) => console.log("Server response:", data))
-        .catch((error) => console.error("Error tracking interaction:", error));
-    });
-  });
-</script>
 {% endblock %}

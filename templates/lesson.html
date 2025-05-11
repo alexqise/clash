@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- Ultra-clean, modern Notion-style lesson page: no cards, no borders, just whitespace and blocks -->
+
+<!-- Lesson Title -->
+<h2 class="mb-2 fw-semibold" style="font-size:1.5rem;">{{ lesson.title }}</h2>
+
+<!-- Main Lesson Image -->
+<img src="{{ lesson.image_url }}" class="img-fluid rounded mb-3" alt="{{ lesson.title }} image" style="max-height:180px; object-fit:contain;">
+
+
+<!-- Lesson Description -->
+<p class="mb-4 text-secondary" style="font-size:1.05rem;">{{ lesson.description }}</p>
+
+<!-- Optional GIF/Video Block (no border, no shadow) -->
+{% if lesson.media_placeholders.gif != '/static/placeholder.gif' %}
+  {% if lesson.media_placeholders.gif.endswith('.mp4') %}
+    <video src="{{ lesson.media_placeholders.gif }}" class="img-fluid rounded mb-3" controls loop muted playsinline style="max-width:100%;height:auto;">
+      Your browser does not support the video tag.
+    </video>
+  {% else %}
+    <img src="{{ lesson.media_placeholders.gif }}" class="img-fluid rounded mb-3" alt="GIF/Video coming soon!" style="max-height:180px; object-fit:contain;">
+  {% endif %}
+{% endif %}
+
+<!-- Optional Audio Block -->
+{% if lesson.media_placeholders.audio != '/static/placeholder.mp3' %}
+<audio src="{{ lesson.media_placeholders.audio }}" controls class="mb-4 w-100" aria-label="Audio feedback"></audio>
+{% endif %}
+
+<!-- Section: Counters (show images horizontally with names above) -->
+<div class="mb-4">
+  <div class="small text-uppercase text-muted mb-2" style="letter-spacing:0.5px; font-size:0.92rem;">Counters</div>
+  <div class="d-flex flex-wrap gap-3">
+    {% for counter in lesson.counters %}
+      <div class="text-center" style="width: 80px;">
+        <div class="small text-center mb-1">{{ counter }}</div>
+        <img src="/static/images/{{ counter|lower|replace(' ', '_') }}.png" alt="{{ counter }}" class="img-fluid rounded" style="height:55px; width:auto; object-fit:contain;">
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- Section: Tips -->
+<div class="mb-4">
+  <div class="small text-uppercase text-muted mb-2" style="letter-spacing:0.5px; font-size:0.92rem;">Tips</div>
+  <ul class="ps-3 mb-0">
+    {% for tip in lesson.tips %}
+      <li class="mb-2">
+        {{ tip }}
+      </li>
+    {% endfor %}
+  </ul>
+</div>
+
+<!-- Minimal Progress Bar -->
+<div class="progress my-3" style="height: 0.35rem; background: #ececec;">
+  <div class="progress-bar bg-primary" role="progressbar" style="width: {{ (progress[0] / progress[1]) * 100 }}%" aria-valuenow="{{ progress[0] }}" aria-valuemin="1" aria-valuemax="{{ progress[1] }}"></div>
+</div>
+<div class="text-end text-muted small mb-2">Lesson {{ progress[0] }} / {{ progress[1] }}</div>
+
+<!-- Navigation Buttons: minimal, flat -->
+<form method="post" class="d-flex justify-content-between gap-2 mt-2">
+  <button type="submit" name="action" value="prev" class="btn btn-link text-secondary px-3 py-2" style="text-decoration:none;" aria-label="Previous Lesson" {% if progress[0] == 1 %}disabled{% endif %}>Previous</button>
+  <button type="submit" name="action" value="next" class="btn btn-link text-primary px-3 py-2" style="text-decoration:none;" aria-label="Next Lesson" {% if progress[0] == progress[1] %}disabled{% endif %}>Next</button>
+</form>
+
+<!-- Go to Quiz Button (only on last lesson) -->
+{% if progress[0] == progress[1] %}
+  <div class="text-center mt-4">
+    <a href="/quiz" class="btn btn-success btn-lg px-5 py-3" aria-label="Go to Quiz">Go to Quiz</a>
+  </div>
+{% endif %}
+
+{% endblock %} 
