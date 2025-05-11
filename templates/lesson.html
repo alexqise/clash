@@ -29,42 +29,25 @@
 <audio src="{{ lesson.media_placeholders.audio }}" controls class="mb-4 w-100" aria-label="Audio feedback"></audio>
 {% endif %}
 
-<!-- Section: Counters (show small images for known cards) -->
-<div class="mb-3">
-  <div class="small text-uppercase text-muted mb-1" style="letter-spacing:0.5px; font-size:0.92rem;">Counters</div>
-  <ul class="ps-3 mb-0">
+<!-- Section: Counters (show images horizontally with names above) -->
+<div class="mb-4">
+  <div class="small text-uppercase text-muted mb-2" style="letter-spacing:0.5px; font-size:0.92rem;">Counters</div>
+  <div class="d-flex flex-wrap gap-3">
     {% for counter in lesson.counters %}
-      <li>
-        {% if counter|lower == 'mega knight' %}
-          <img src="https://pm1.aminoapps.com/6497/a670c19ba86e56332c2650683bf97adeb66b8597_00.jpg" alt="Mega Knight" style="height:22px;vertical-align:middle;margin-right:6px;">
-        {% elif counter|lower == 'elite barbarians' %}
-          <img src="https://static.wikia.nocookie.net/clashroyale/images/e/e8/EliteBarbariansCard.png/revision/latest/thumbnail/width/360/height/450?cb=20171212204714" alt="Elite Barbarians" style="height:22px;vertical-align:middle;margin-right:6px;">
-        {% elif counter|lower == 'arrows' %}
-          <img src="https://static.wikia.nocookie.net/clashroyale/images/6/6e/ArrowsCard.png/revision/latest?cb=20171212203258" alt="Arrows" style="height:22px;vertical-align:middle;margin-right:6px;">
-        {% elif counter|lower == 'fireball' %}
-          <img src="https://static.wikia.nocookie.net/clashroyale/images/f/f4/FireballCard.png/revision/latest/thumbnail/width/360/height/450?cb=20171212204724" alt="Fireball" style="height:22px;vertical-align:middle;margin-right:6px;">
-        {% elif counter|lower == 'zap' %}
-          <img src="https://static.wikia.nocookie.net/clashroyale/images/5/52/ZapCard.png/revision/latest?cb=20171212203728" alt="Zap" style="height:22px;vertical-align:middle;margin-right:6px;">
-        {% endif %}
-        {{ counter }}
-      </li>
+      <div class="text-center" style="width: 80px;">
+        <div class="small text-center mb-1">{{ counter }}</div>
+        <img src="/static/images/{{ counter|lower|replace(' ', '_') }}.png" alt="{{ counter }}" class="img-fluid rounded" style="height:55px; width:auto; object-fit:contain;">
+      </div>
     {% endfor %}
-  </ul>
+  </div>
 </div>
 
-<!-- Section: Tips (show small images for known cards) -->
-<div class="mb-3">
-  <div class="small text-uppercase text-muted mb-1" style="letter-spacing:0.5px; font-size:0.92rem;">Tips</div>
+<!-- Section: Tips -->
+<div class="mb-4">
+  <div class="small text-uppercase text-muted mb-2" style="letter-spacing:0.5px; font-size:0.92rem;">Tips</div>
   <ul class="ps-3 mb-0">
     {% for tip in lesson.tips %}
-      <li>
-        {% if 'arrows' in tip|lower %}
-          <img src="https://static.wikia.nocookie.net/clashroyale/images/6/6e/ArrowsCard.png/revision/latest?cb=20171212203258" alt="Arrows" style="height:20px;vertical-align:middle;margin-right:6px;">
-        {% elif 'fireball' in tip|lower %}
-          <img src="https://static.wikia.nocookie.net/clashroyale/images/f/f4/FireballCard.png/revision/latest/thumbnail/width/360/height/450?cb=20171212204724" alt="Fireball" style="height:20px;vertical-align:middle;margin-right:6px;">
-        {% elif 'zap' in tip|lower %}
-          <img src="https://static.wikia.nocookie.net/clashroyale/images/5/52/ZapCard.png/revision/latest?cb=20171212203728" alt="Zap" style="height:20px;vertical-align:middle;margin-right:6px;">
-        {% endif %}
+      <li class="mb-2">
         {{ tip }}
       </li>
     {% endfor %}
@@ -73,7 +56,7 @@
 
 <!-- Minimal Progress Bar -->
 <div class="progress my-3" style="height: 0.35rem; background: #ececec;">
-  <div class="progress-bar bg-primary" role="progressbar" style="width: {{ (progress[0] / progress[1]) * 100 }}%;" aria-valuenow="{{ progress[0] }}" aria-valuemin="1" aria-valuemax="{{ progress[1] }}"></div>
+  <div class="progress-bar bg-primary" role="progressbar" style="width: {{ (progress[0] / progress[1]) * 100 }}%" aria-valuenow="{{ progress[0] }}" aria-valuemin="1" aria-valuemax="{{ progress[1] }}"></div>
 </div>
 <div class="text-end text-muted small mb-2">Lesson {{ progress[0] }} / {{ progress[1] }}</div>
 
