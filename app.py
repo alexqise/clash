@@ -78,16 +78,16 @@ def quiz():
     if request.method == 'POST':
         action = request.form.get('action')
         if action in ['next', 'prev']:
-            if action == 'next' and idx < len(quiz_questions) - 1:
-                idx += 1
+            if action == 'next':
+                if idx < len(quiz_questions) - 1:
+                    idx += 1
+                elif idx == len(quiz_questions) - 1:
+                    # User clicked Next on the last question, redirect to certificate
+                    return redirect(url_for('certificate'))
             elif action == 'prev' and idx > 0:
                 idx -= 1
             session['quiz_idx'] = idx
             log_interaction(action, quiz_questions[idx]['id'])
-            progress = (idx + 1, len(quiz_questions))  # Ensure progress is defined before use
-            # Redirect to certificate if finished last question
-            if action == 'next' and idx == len(quiz_questions) - 1 and session['quiz_answers'][idx] is not None:
-                return redirect(url_for('certificate'))
         elif action == 'answer':
             selected = request.form.get('option')
             if selected is not None:
@@ -95,9 +95,6 @@ def quiz():
                 session['quiz_answers'][idx] = int(selected)
                 session.modified = True  # Ensure session is saved
                 log_interaction('answer', quiz_questions[idx]['id'])
-                # Provide immediate feedback
-                correct = quiz_questions[idx]['correct_answer_index']
-                feedback = (int(selected) == correct)
                 # Just redirect back to the same question to refresh
                 return redirect(url_for('quiz'))
     
