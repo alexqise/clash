@@ -103,13 +103,18 @@
       id="drag-feedback"
       class="mb-3"
     ></div>
+    <!-- Hidden form to submit the answer -->
+    <form id="answer-form" method="post" style="display:none;">
+      <input type="hidden" name="action" value="answer">
+      <input type="hidden" id="selected-option" name="option" value="">
+    </form>
     <div class="d-flex justify-content-between gap-2 mt-2">
       <!-- Navigation buttons for quiz -->
       <form method="post" style="display:inline;">
         <button type="submit" name="action" value="prev" class="btn btn-secondary px-4 py-2" aria-label="Previous Question" {% if progress[0] == 1 %}disabled{% endif %}>Previous</button>
       </form>
       <form method="post" style="display:inline;">
-        <button id="next-btn" type="submit" name="action" value="next" class="btn btn-primary px-4 py-2" aria-label="Next Question" {% if progress[0] == progress[1] %}disabled{% endif %} disabled>Next</button>
+        <button id="next-btn" type="submit" name="action" value="next" class="btn btn-primary px-4 py-2" aria-label="Next Question" {% if progress[0] == progress[1] %}disabled{% endif %} {% if not is_correct %}disabled{% endif %}>Next</button>
       </form>
     </div>
     <script>
@@ -119,7 +124,19 @@
       let correctIdx = {{ question.correct_answer_index }};
       let feedback = document.getElementById('drag-feedback');
       let nextBtn = document.getElementById('next-btn');
-      let answeredCorrectly = false;
+      let answeredCorrectly = {% if is_correct %}true{% else %}false{% endif %};
+      const answerForm = document.getElementById('answer-form');
+      const selectedOption = document.getElementById('selected-option');
+      
+      // Display feedback based on previous answer
+      {% if answer is not none %}
+        {% if is_correct %}
+          feedback.innerHTML = '<div class="alert alert-success">Correct!</div>';
+        {% else %}
+          feedback.innerHTML = '<div class="alert alert-danger">Incorrect. Try dragging the correct card!</div>';
+        {% endif %}
+      {% endif %}
+      
       cards.forEach(card => {
         card.addEventListener('dragstart', e => {
           e.dataTransfer.setData('text/plain', card.dataset.idx);
@@ -136,16 +153,10 @@
         e.preventDefault();
         dropZone.style.boxShadow = '0 0 24px 8px #ffe06688';
         let idx = parseInt(e.dataTransfer.getData('text/plain'));
-        if(idx === correctIdx) {
-          feedback.innerHTML = '<div class="alert alert-success">Correct!</div>';
-          answeredCorrectly = true;
-          nextBtn.disabled = false;
-        } else {
-          feedback.innerHTML = '<div class="alert alert-danger">Incorrect. Try dragging the correct card!</div>';
-        }
+        // Always save the selected answer to session
+        selectedOption.value = idx;
+        answerForm.submit();
       });
-      // On page load, keep Next disabled
-      nextBtn.disabled = !answeredCorrectly;
     </script>
     <!-- Progress bar -->
     <div

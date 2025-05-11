@@ -51,7 +51,18 @@ def lesson():
 @app.route('/certificate')
 def certificate():
     """Show a certificate of completion after finishing the quiz."""
-    return render_template('certificate.html')
+    # Calculate quiz score based on correct answers
+    quiz_answers = session.get('quiz_answers', [None] * len(quiz_questions))
+    correct_count = 0
+    for i, answer in enumerate(quiz_answers):
+        if answer is not None and answer == quiz_questions[i]['correct_answer_index']:
+            correct_count += 1
+    
+    # Calculate percentage score (avoid division by zero)
+    total_questions = len(quiz_questions)
+    quiz_score = round((correct_count / total_questions) * 100) if total_questions > 0 else 0
+    
+    return render_template('certificate.html', quiz_score=quiz_score)
 
 @app.route('/quiz', methods=['GET', 'POST'])
 def quiz():
@@ -75,20 +86,32 @@ def quiz():
             log_interaction(action, quiz_questions[idx]['id'])
             progress = (idx + 1, len(quiz_questions))  # Ensure progress is defined before use
             # Redirect to certificate if finished last question
-            if action == 'next' and idx == len(quiz_questions) - 1 and progress[0] == progress[1]:
+            if action == 'next' and idx == len(quiz_questions) - 1 and session['quiz_answers'][idx] is not None:
                 return redirect(url_for('certificate'))
         elif action == 'answer':
             selected = request.form.get('option')
             if selected is not None:
+                # Store the answer in session
                 session['quiz_answers'][idx] = int(selected)
+                session.modified = True  # Ensure session is saved
                 log_interaction('answer', quiz_questions[idx]['id'])
                 # Provide immediate feedback
                 correct = quiz_questions[idx]['correct_answer_index']
                 feedback = (int(selected) == correct)
+                # Just redirect back to the same question to refresh
+                return redirect(url_for('quiz'))
+    
     progress = (idx + 1, len(quiz_questions))  # Always set before rendering
     question = quiz_questions[idx]
     answer = session['quiz_answers'][idx]
-    return render_template('quiz.html', question=question, answer=answer, feedback=feedback, progress=progress)
+    
+    # Check if the current answer is correct to enable the Next button
+    is_correct = False
+    if answer is not None:
+        is_correct = (answer == question['correct_answer_index'])
+    
+    return render_template('quiz.html', question=question, answer=answer, feedback=feedback, 
+                           progress=progress, is_correct=is_correct)
 
 @app.route('/interactions')
 def interactions():
