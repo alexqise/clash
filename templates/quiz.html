@@ -18,27 +18,29 @@
       {{ question.question }}
     </p>
     <!-- Optional GIF/Video placeholder -->
-    {% if question.media_placeholders.gif.endswith('.mp4') %}
-    <!-- Render video if URL is mp4 -->
-    <video
-      src="{{ question.media_placeholders.gif }}"
-      class="img-fluid rounded shadow-sm mb-3"
-      controls
-      loop
-      muted
-      playsinline
-      style="max-width: 100%; height: auto; background: #f3f4f6"
-    >
-      Your browser does not support the video tag.
-    </video>
-    {% else %}
-    <!-- Render image if URL is gif or other -->
-    <img
-      src="{{ question.media_placeholders.gif }}"
-      class="img-fluid rounded shadow-sm mb-3"
-      alt="GIF/Video coming soon!"
-      style="max-height: 220px; object-fit: contain; background: #f3f4f6"
-    />
+    {% if question.media_placeholders.gif and question.media_placeholders.gif != '/static/placeholder.gif' %}
+      {% if question.media_placeholders.gif.endswith('.mp4') %}
+      <!-- Render video if URL is mp4 -->
+      <video
+        src="{{ question.media_placeholders.gif }}"
+        class="img-fluid rounded shadow-sm mb-3"
+        controls
+        loop
+        muted
+        playsinline
+        style="max-width: 100%; height: auto; background: #f3f4f6"
+      >
+        Your browser does not support the video tag.
+      </video>
+      {% else %}
+      <!-- Render image if URL is gif or other -->
+      <img
+        src="{{ question.media_placeholders.gif }}"
+        class="img-fluid rounded shadow-sm mb-3"
+        alt="GIF/Video coming soon!"
+        style="max-height: 220px; object-fit: contain; background: #f3f4f6"
+      />
+      {% endif %}
     {% endif %}
     <hr class="my-4" />
     <!-- Interactive Board for All Quiz Questions -->
