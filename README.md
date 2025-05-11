@@ -25,9 +25,9 @@ An interactive web app to teach Clash Royale win conditions and counters using s
    ```
 3. Run the app:
    ```sh
-   flask run
+   python app.py
    ```
-4. Open [http://localhost:5000](http://localhost:5000) in your browser.
+4. Open the link in the your terminal (ip_address:5000)
 
 ## Testing
 
