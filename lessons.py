@@ -12,8 +12,8 @@ lessons = [
             'gif': '/static/placeholder.gif',
             'audio': '/static/placeholder.mp3',
         },
-        'counters': ['Building placement', 'Cheap cycle cards'],
-        'tips': ['Always have a counter in hand.', "Don't overcommit elixir."],
+        'counters': ['Cannon', 'Zap', 'Skeleton Army', 'Fireball', 'Inferno Tower'],
+        'tips': ['Always have a counter in hand.', "Don't overcommit elixir.", "Go for positive elixir trades."],
     },
     {
         'id': 2,
