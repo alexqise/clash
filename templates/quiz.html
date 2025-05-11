@@ -85,7 +85,7 @@
         class="draggable-card"
         draggable="true"
         data-idx="{{ loop.index0 }}"
-        style="width: 80px; cursor: grab"
+        style="width: 100px; cursor: grab"
       >
         <img
           src="/static/images/{{ card|lower|replace(' ','_') }}.png"
@@ -98,6 +98,9 @@
           style="font-size: 0.95rem; font-weight: 500"
         >
           {{ card }}
+        </div>
+        <div class="text-center text-muted" style="font-size: 0.75rem; line-height: 1.1;">
+          {{ question.card_descriptions[card] if question.card_descriptions and card in question.card_descriptions else "" }}
         </div>
       </div>
       {% endfor %}
