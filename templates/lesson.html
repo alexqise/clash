@@ -6,21 +6,9 @@
 <!-- Lesson Title -->
 <h2 class="mb-2 fw-semibold" style="font-size:1.5rem;">{{ lesson.title }}</h2>
 
-<!-- Main Lesson Image: Use Golem, Mega Knight, or other relevant card -->
-{% if lesson.title|lower == 'golem' %}
-  <img src="https://static.wikia.nocookie.net/clashofclans/images/3/3f/Golem.jpeg/revision/latest?cb=20150315220344" alt="Golem" class="img-fluid rounded mb-3" style="max-height:180px; object-fit:contain;">
-{% elif lesson.title|lower == 'mega knight' %}
-  <img src="https://pm1.aminoapps.com/6497/a670c19ba86e56332c2650683bf97adeb66b8597_00.jpg" alt="Mega Knight" class="img-fluid rounded mb-3" style="max-height:180px; object-fit:contain;">
-  <!-- Mega Knight MP3 audio block -->
-  <audio controls class="mb-3 w-100" aria-label="Mega Knight Sound">
-    <source src="https://clash-files.s3.amazonaws.com/mega_knight.mp3" type="audio/mpeg">
-    Your browser does not support the audio element.
-  </audio>
-{% elif lesson.title|lower == 'elite barbarians' %}
-  <img src="https://static.wikia.nocookie.net/clashroyale/images/e/e8/EliteBarbariansCard.png/revision/latest/thumbnail/width/360/height/450?cb=20171212204714" alt="Elite Barbarians" class="img-fluid rounded mb-3" style="max-height:180px; object-fit:contain;">
-{% else %}
-  <img src="{{ lesson.image_url }}" class="img-fluid rounded mb-3" alt="Lesson image" style="max-height:180px; object-fit:contain;">
-{% endif %}
+<!-- Main Lesson Image -->
+<img src="{{ lesson.image_url }}" class="img-fluid rounded mb-3" alt="{{ lesson.title }} image" style="max-height:180px; object-fit:contain;">
+
 
 <!-- Lesson Description -->
 <p class="mb-4 text-secondary" style="font-size:1.05rem;">{{ lesson.description }}</p>
