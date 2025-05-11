@@ -13,6 +13,81 @@
 <!-- Lesson Description -->
 <p class="mb-4 text-secondary" style="font-size:1.05rem;">{{ lesson.description }}</p>
 
+<!-- YouTube Video Players -->
+{% if lesson.title|lower == 'what is a win condition?' %}
+  <div class="mb-4">
+    <div class="ratio ratio-16x9">
+      <iframe 
+        src="https://www.youtube.com/embed/BDpCtAPyuyY" 
+        title="Win Conditions Tutorial" 
+        frameborder="0" 
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+        allowfullscreen>
+      </iframe>
+    </div>
+  </div>
+{% elif lesson.title|lower == 'countering hog rider' %}
+  <div class="mb-4">
+    <div class="ratio ratio-16x9">
+      <iframe 
+        src="https://www.youtube.com/embed/o2g_Kqv-zs0" 
+        title="Countering Hog Rider Tutorial" 
+        frameborder="0" 
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+        allowfullscreen>
+      </iframe>
+    </div>
+  </div>
+{% elif lesson.title|lower == 'mega knight' %}
+  <div class="mb-4">
+    <div class="ratio ratio-16x9">
+      <iframe 
+        src="https://www.youtube.com/embed/9tR5b8ZxOJE" 
+        title="Countering Mega Knight Tutorial" 
+        frameborder="0" 
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+        allowfullscreen>
+      </iframe>
+    </div>
+  </div>
+{% elif lesson.title|lower == 'golem' %}
+  <div class="mb-4">
+    <div class="ratio ratio-16x9">
+      <iframe 
+        src="https://www.youtube.com/embed/WZ8VZdjDcJM" 
+        title="Countering Golem Tutorial" 
+        frameborder="0" 
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+        allowfullscreen>
+      </iframe>
+    </div>
+  </div>
+{% elif lesson.title|lower == 'lava hound' %}
+  <div class="mb-4">
+    <div class="ratio ratio-16x9">
+      <iframe 
+        src="https://www.youtube.com/embed/9C9O5yBiUmA" 
+        title="Countering Lava Hound Tutorial" 
+        frameborder="0" 
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+        allowfullscreen>
+      </iframe>
+    </div>
+  </div>
+{% elif lesson.title|lower == 'elite barbarians' %}
+  <div class="mb-4">
+    <div class="ratio ratio-16x9">
+      <iframe 
+        src="https://www.youtube.com/embed/jlHz9tbFIJA" 
+        title="Countering Elite Barbarians Tutorial" 
+        frameborder="0" 
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+        allowfullscreen>
+      </iframe>
+    </div>
+  </div>
+{% endif %}
+
 <!-- Optional GIF/Video Block (no border, no shadow) -->
 {% if lesson.media_placeholders.gif != '/static/placeholder.gif' %}
   {% if lesson.media_placeholders.gif.endswith('.mp4') %}

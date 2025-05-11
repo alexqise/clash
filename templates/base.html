@@ -2,10 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Clash Royale Learning App</title>
     <!-- Bootstrap 5 CDN -->
     <link
@@ -139,14 +136,14 @@
       </a>
       <a
         class="nav-link {% if request.path.startswith('/lesson') %}active{% endif %}"
-        href="/lesson"
+        href="/lesson?reset=true"
       >
         <span class="me-2"><i class="bi bi-journal-text"></i></span
         ><span>Lessons</span>
       </a>
       <a
         class="nav-link {% if request.path.startswith('/quiz') %}active{% endif %}"
-        href="/quiz"
+        href="/quiz?reset=true"
       >
         <span class="me-2"><i class="bi bi-question-circle"></i></span
         ><span>Quiz</span>

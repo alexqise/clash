@@ -11,6 +11,8 @@ app = Flask(__name__)
 app.secret_key = 'dev-key'  # For session management (replace in production)
 
 # --- Helper Functions ---
+
+
 def log_interaction(button_id, context_id):
     """Log a button interaction with timestamp and context."""
     if 'button_logs' not in session:
@@ -23,18 +25,31 @@ def log_interaction(button_id, context_id):
     session.modified = True
 
 # --- Routes ---
+
+
 @app.route('/')
 def home():
     """Home page with Start Learning button."""
+    # Reset both lesson and quiz progress when visiting home page
+    session['lesson_progress'] = 0
+    session['quiz_idx'] = 0
+    session['quiz_answers'] = [None] * len(quiz_questions)
     return render_template('home.html')
+
 
 @app.route('/lesson', methods=['GET', 'POST'])
 def lesson():
     """Lesson navigation and display."""
-    # Initialize progress if not set
-    if 'lesson_progress' not in session:
+    # Reset quiz progress when coming from another section
+    if request.referrer and '/quiz' in request.referrer:
+        session['quiz_idx'] = 0
+        session['quiz_answers'] = [None] * len(quiz_questions)
+
+    # Initialize or get current lesson progress
+    if 'lesson_progress' not in session or request.args.get('reset'):
         session['lesson_progress'] = 0
     idx = session['lesson_progress']
+
     # Handle navigation
     if request.method == 'POST':
         action = request.form.get('action')
@@ -48,6 +63,7 @@ def lesson():
     progress = (idx + 1, len(lessons))
     return render_template('lesson.html', lesson=lesson, progress=progress)
 
+
 @app.route('/certificate')
 def certificate():
     """Show a certificate of completion after finishing the quiz."""
@@ -57,20 +73,27 @@ def certificate():
     for i, answer in enumerate(quiz_answers):
         if answer is not None and answer == quiz_questions[i]['correct_answer_index']:
             correct_count += 1
-    
+
     # Calculate percentage score (avoid division by zero)
     total_questions = len(quiz_questions)
-    quiz_score = round((correct_count / total_questions) * 100) if total_questions > 0 else 0
-    
+    quiz_score = round((correct_count / total_questions)
+                       * 100) if total_questions > 0 else 0
+
     return render_template('certificate.html', quiz_score=quiz_score)
+
 
 @app.route('/quiz', methods=['GET', 'POST'])
 def quiz():
     """Quiz navigation and answering."""
-    if 'quiz_idx' not in session:
+    # Reset lesson progress when coming from another section
+    if request.referrer and '/lesson' in request.referrer:
+        session['lesson_progress'] = 0
+
+    # Initialize or reset quiz progress
+    if 'quiz_idx' not in session or request.args.get('reset'):
         session['quiz_idx'] = 0
     # Ensure quiz_answers always matches the number of quiz questions
-    if 'quiz_answers' not in session or len(session['quiz_answers']) != len(quiz_questions):
+    if 'quiz_answers' not in session or len(session['quiz_answers']) != len(quiz_questions) or request.args.get('reset'):
         session['quiz_answers'] = [None] * len(quiz_questions)
     idx = session['quiz_idx']
     feedback = None
@@ -97,18 +120,19 @@ def quiz():
                 log_interaction('answer', quiz_questions[idx]['id'])
                 # Just redirect back to the same question to refresh
                 return redirect(url_for('quiz'))
-    
+
     progress = (idx + 1, len(quiz_questions))  # Always set before rendering
     question = quiz_questions[idx]
     answer = session['quiz_answers'][idx]
-    
+
     # Check if the current answer is correct to enable the Next button
     is_correct = False
     if answer is not None:
         is_correct = (answer == question['correct_answer_index'])
-    
-    return render_template('quiz.html', question=question, answer=answer, feedback=feedback, 
+
+    return render_template('quiz.html', question=question, answer=answer, feedback=feedback,
                            progress=progress, is_correct=is_correct)
+
 
 @app.route('/interactions')
 def interactions():
@@ -119,5 +143,6 @@ def interactions():
     pages_visited = len(set(log['context'] for log in logs))
     return render_template('interactions.html', logs=logs, total_clicks=total_clicks, unique_buttons=unique_buttons, pages_visited=pages_visited)
 
+
 if __name__ == '__main__':
-    app.run(debug=True) 
+    app.run(debug=True)
