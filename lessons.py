@@ -35,7 +35,7 @@ lessons = [
         'description': 'The Mega Knight is a high-cost, high-health troop that deals area damage and has a unique spawn jump. Best deployed defensively to counter swarms and then used in a counterpush.',
         'image_url': '/static/images/mega_knight.png',
         'media_placeholders': {
-            'gif': 'https://media.tenor.com/PzU0RE1aOXUAAAAC/mega-knight.gif',
+            'gif': '/static/mega_knight.gif',
             'audio': '/static/placeholder.mp3',
         },
         'counters': ['P.E.K.K.A', 'Mini P.E.K.K.A', 'Inferno Tower', 'Skeleton Army', 'Valkyrie'],
@@ -47,7 +47,7 @@ lessons = [
         'description': 'The Golem is a slow, ground-based tank with massive health. Upon death, it splits into two Golemites. Best used behind your towers to build a strong push.',
         'image_url': '/static/images/golem.png',
         'media_placeholders': {
-            'gif': 'https://media.tenor.com/O8zMefXUQHIAAAAC/golem-clash-royale.gif',
+            'gif': '/static/golem.gif',
             'audio': '/static/placeholder.mp3',
         },
         'counters': ['Inferno Tower', 'Mini P.E.K.K.A', 'Lumberjack', 'Night Witch', 'P.E.K.K.A'],
@@ -59,7 +59,7 @@ lessons = [
         'description': 'The Lava Hound is a flying tank that targets buildings. Upon death, it bursts into several Lava Pups that deal chip damage.',
         'image_url': '/static/images/lava_hound.png',
         'media_placeholders': {
-            'gif': 'https://media.tenor.com/Mbwa-EAyAakAAAAC/lava-hound.gif',
+            'gif': '/static/lava_hound.gif',
             'audio': '/static/placeholder.mp3',
         },
         'counters': ['Minions', 'Mega Minion', 'Inferno Dragon', 'Electro Dragon', 'Musketeer'],
@@ -71,7 +71,7 @@ lessons = [
         'description': 'Elite Barbarians are a fast, high-damage pair of melee units. They can shred through low-health troops and towers if left unchecked.',
         'image_url': '/static/images/elite_barbarians.png',
         'media_placeholders': {
-            'gif': 'https://media.tenor.com/LnJJM1CyaQ8AAAAC/elite-barbarians-clash-royale.gif',
+            'gif': '/static/elite_barbarians.gif',
             'audio': '/static/placeholder.mp3',
         },
         'counters': ['P.E.K.K.A', 'Mini P.E.K.K.A', 'Fireball', 'Valkyrie', 'Skeleton Army'],
