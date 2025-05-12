@@ -84,5 +84,14 @@
     aria-label="Return Home"
     >Return Home</a
   >
+
+  {% if from_lesson %}
+  <a
+    href="/lesson?id={{ from_lesson }}"
+    class="btn btn-secondary btn-lg mt-4 ms-2 px-5 py-3"
+    aria-label="Back to Lesson"
+    >Back to Lesson</a
+  >
+  {% endif %}
 </div>
 {% endblock %}

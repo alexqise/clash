@@ -119,6 +119,10 @@
       <form method="post" style="display:inline;">
         <button type="submit" name="action" value="prev" class="btn btn-secondary px-4 py-2" aria-label="Previous Question" {% if progress[0] == 1 %}disabled{% endif %}>Previous</button>
       </form>
+      
+      <!-- Reset button -->
+      <a href="/quiz?reset=true" class="btn btn-outline-secondary align-self-center" style="font-size: 0.85rem;">Reset Quiz</a>
+      
       <form method="post" style="display:inline;">
         <button id="next-btn" type="submit" name="action" value="next" class="btn btn-primary px-4 py-2" aria-label="Next Question" {% if not is_correct %}disabled{% endif %}>{% if progress[0] == progress[1] %}Finish Quiz{% else %}Next{% endif %}</button>
       </form>

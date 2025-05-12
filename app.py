@@ -30,10 +30,20 @@ def log_interaction(button_id, context_id):
 @app.route('/')
 def home():
     """Home page with Start Learning button."""
-    # Reset both lesson and quiz progress when visiting home page
-    session['lesson_progress'] = 0
-    session['quiz_idx'] = 0
-    session['quiz_answers'] = [None] * len(quiz_questions)
+    # Initialize progress if not already set
+    if 'lesson_progress' not in session:
+        session['lesson_progress'] = 0
+    if 'quiz_idx' not in session:
+        session['quiz_idx'] = 0
+    if 'quiz_answers' not in session:
+        session['quiz_answers'] = [None] * len(quiz_questions)
+
+    # Only reset if explicitly requested
+    if request.args.get('reset'):
+        session['lesson_progress'] = 0
+        session['quiz_idx'] = 0
+        session['quiz_answers'] = [None] * len(quiz_questions)
+
     return render_template('home.html')
 
 
@@ -64,14 +74,24 @@ def play():
 @app.route('/lesson', methods=['GET', 'POST'])
 def lesson():
     """Lesson navigation and display."""
-    # Reset quiz progress when coming from another section
-    if request.referrer and '/quiz' in request.referrer:
-        session['quiz_idx'] = 0
-        session['quiz_answers'] = [None] * len(quiz_questions)
-
-    # Initialize or get current lesson progress
-    if 'lesson_progress' not in session or request.args.get('reset'):
+    # Initialize lesson progress if not already set
+    if 'lesson_progress' not in session:
         session['lesson_progress'] = 0
+
+    # Only reset progress if explicitly requested
+    if request.args.get('reset'):
+        session['lesson_progress'] = 0
+
+    # Check if a specific lesson ID is requested
+    specific_lesson = request.args.get('id')
+    if specific_lesson and specific_lesson.isdigit():
+        # Find the lesson with this ID
+        lesson_id = int(specific_lesson)
+        for i, l in enumerate(lessons):
+            if l['id'] == lesson_id:
+                session['lesson_progress'] = i
+                break
+
     idx = session['lesson_progress']
 
     # Handle navigation
@@ -83,6 +103,9 @@ def lesson():
             idx -= 1
         session['lesson_progress'] = idx
         log_interaction(action, lessons[idx]['id'])
+        # Redirect to the lesson with ID to maintain state on refresh
+        return redirect(url_for('lesson', id=lessons[idx]['id']))
+
     lesson = lessons[idx]
     progress = (idx + 1, len(lessons))
     return render_template('lesson.html', lesson=lesson, progress=progress)
@@ -103,22 +126,43 @@ def certificate():
     quiz_score = round((correct_count / total_questions)
                        * 100) if total_questions > 0 else 0
 
-    return render_template('certificate.html', quiz_score=quiz_score)
+    # Get the lesson ID the user came from, if available
+    from_lesson = session.get('from_lesson')
+
+    return render_template('certificate.html', quiz_score=quiz_score, from_lesson=from_lesson)
 
 
 @app.route('/quiz', methods=['GET', 'POST'])
 def quiz():
     """Quiz navigation and answering."""
-    # Reset lesson progress when coming from another section
-    if request.referrer and '/lesson' in request.referrer:
-        session['lesson_progress'] = 0
-
-    # Initialize or reset quiz progress
-    if 'quiz_idx' not in session or request.args.get('reset'):
+    # Initialize quiz progress if not already set
+    if 'quiz_idx' not in session:
         session['quiz_idx'] = 0
-    # Ensure quiz_answers always matches the number of quiz questions
-    if 'quiz_answers' not in session or len(session['quiz_answers']) != len(quiz_questions) or request.args.get('reset'):
+
+    # Track which lesson the user came from if provided
+    from_lesson = request.args.get('from_lesson')
+    if from_lesson:
+        session['from_lesson'] = from_lesson
+
+    # Only reset progress if explicitly requested
+    if request.args.get('reset'):
+        session['quiz_idx'] = 0
         session['quiz_answers'] = [None] * len(quiz_questions)
+
+    # Check if a specific question ID is requested
+    specific_question = request.args.get('id')
+    if specific_question and specific_question.isdigit():
+        # Find the question with this ID
+        question_id = int(specific_question)
+        for i, q in enumerate(quiz_questions):
+            if q['id'] == question_id:
+                session['quiz_idx'] = i
+                break
+
+    # Ensure quiz_answers always matches the number of quiz questions
+    if 'quiz_answers' not in session or len(session['quiz_answers']) != len(quiz_questions):
+        session['quiz_answers'] = [None] * len(quiz_questions)
+
     idx = session['quiz_idx']
     feedback = None
     # Handle answer submission
@@ -135,6 +179,8 @@ def quiz():
                 idx -= 1
             session['quiz_idx'] = idx
             log_interaction(action, quiz_questions[idx]['id'])
+            # Redirect to maintain state on refresh
+            return redirect(url_for('quiz', id=quiz_questions[idx]['id']))
         elif action == 'answer':
             selected = request.form.get('option')
             if selected is not None:
@@ -142,8 +188,8 @@ def quiz():
                 session['quiz_answers'][idx] = int(selected)
                 session.modified = True  # Ensure session is saved
                 log_interaction('answer', quiz_questions[idx]['id'])
-                # Just redirect back to the same question to refresh
-                return redirect(url_for('quiz'))
+                # Redirect to maintain state and show feedback
+                return redirect(url_for('quiz', id=quiz_questions[idx]['id']))
 
     progress = (idx + 1, len(quiz_questions))  # Always set before rendering
     question = quiz_questions[idx]

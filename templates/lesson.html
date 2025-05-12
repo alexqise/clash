@@ -141,13 +141,14 @@
 <!-- Navigation Buttons: minimal, flat -->
 <form method="post" class="d-flex justify-content-between gap-2 mt-2">
   <button type="submit" name="action" value="prev" class="btn btn-link text-secondary px-3 py-2" style="text-decoration:none;" aria-label="Previous Lesson" {% if progress[0] == 1 %}disabled{% endif %}>Previous</button>
+  <a href="/lesson?reset=true" class="btn btn-outline-secondary btn-sm align-self-center" style="font-size: 0.8rem;">Reset</a>
   <button type="submit" name="action" value="next" class="btn btn-link text-primary px-3 py-2" style="text-decoration:none;" aria-label="Next Lesson" {% if progress[0] == progress[1] %}disabled{% endif %}>Next</button>
 </form>
 
 <!-- Go to Quiz Button (only on last lesson) -->
 {% if progress[0] == progress[1] %}
   <div class="text-center mt-4">
-    <a href="/quiz" class="btn btn-success btn-lg px-5 py-3" aria-label="Go to Quiz">Go to Quiz</a>
+    <a href="/quiz?from_lesson={{ lesson.id }}" class="btn btn-success btn-lg px-5 py-3" aria-label="Go to Quiz">Go to Quiz</a>
   </div>
 {% endif %}
 
