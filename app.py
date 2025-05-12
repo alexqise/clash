@@ -8,24 +8,132 @@ from quizzes import quiz_questions
 from datetime import datetime
 
 app = Flask(__name__)
-app.secret_key = 'dev-key'  # For session management (replace in production)
+app.secret_key = "replace-this-with-a-very-secret-key-123"
 
-# --- Helper Functions ---
-
-
-def log_interaction(button_id, context_id):
-    """Log a button interaction with timestamp and context."""
+def log_interaction(action, item_id):
+    # Simple logger: store logs in session
     if 'button_logs' not in session:
         session['button_logs'] = []
     session['button_logs'].append({
-        'timestamp': datetime.now().isoformat(timespec='seconds'),
-        'button': button_id,
-        'context': context_id,
+        'button': action,
+        'context': item_id,
+        'timestamp': datetime.now().isoformat()
     })
     session.modified = True
 
-# --- Routes ---
+# Data for learning and quiz content - in a real app, this might come from a database
+# Clash Royale win conditions and their counters
+clash_data = {
+    "lessons": [
+        {
+            "id": 1,
+            "title": "Hog Rider",
+            "description": "The Hog Rider is a fast-moving troop that targets buildings. It's a popular win condition in many decks.",
+            "image_url": "https://cdn.royaleapi.com/static/img/cards-75/hog-rider.png",
+            "counters": [
+                "Buildings like Cannon or Tesla",
+                "Tornado to activate King Tower",
+                "PEKKA for positive elixir trade",
+                "Mini PEKKA for quick defense"
+            ],
+            "tips": "Always try to place buildings in the optimal position to pull the Hog Rider. Time your counters well to minimize the damage."
+        },
+        {
+            "id": 2,
+            "title": "Balloon",
+            "description": "The Balloon is a flying troop that does massive damage to buildings. It's deadly if it reaches the tower.",
+            "image_url": "https://cdn.royaleapi.com/static/img/cards-75/balloon.png",
+            "counters": [
+                "Air targeting troops like Musketeer",
+                "Buildings to distract",
+                "Rocket for direct damage",
+                "Tesla or Inferno Tower"
+            ],
+            "tips": "Position your anti-air units carefully and be ready with spells to counter Balloon support troops."
+        },
+        {
+            "id": 3,
+            "title": "Golem",
+            "description": "The Golem is a high-health troop that targets buildings and deals death damage. It's a heavy tank used in beatdown decks.",
+            "image_url": "https://cdn.royaleapi.com/static/img/cards-75/golem.png",
+            "counters": [
+                "Inferno Tower/Dragon for high damage",
+                "PEKKA as a tank killer",
+                "Pressure opposite lane to reduce elixir for support",
+                "Buildings to distract"
+            ],
+            "tips": "When facing Golem, consider pressuring the opposite lane to force your opponent to spend elixir defensively rather than supporting their Golem push."
+        }
+    ],
+    "quiz": [
+        {
+            "id": 1,
+            "question": "What is the best counter to Hog Rider?",
+            "options": [
+                "Skeleton Army",
+                "Cannon or Tesla",
+                "Fireball",
+                "Goblin Gang"
+            ],
+            "answer": 1  # Index of correct answer (0-based)
+        },
+        {
+            "id": 2,
+            "question": "How should you counter Balloon?",
+            "options": [
+                "Use ground troops like Knight",
+                "Use Goblin Barrel on King Tower",
+                "Use air-targeting troops or buildings",
+                "Use Earthquake"
+            ],
+            "answer": 2
+        },
+        {
+            "id": 3,
+            "question": "What's a good strategy against Golem decks?",
+            "options": [
+                "Wait until they place Golem, then push same lane",
+                "Pressure opposite lane when they place Golem",
+                "Save all elixir for defense",
+                "Use Earthquake on their King Tower"
+            ],
+            "answer": 1
+        },
+        {
+            "id": 4,
+            "question": "Which card is NOT effective against Hog Rider?",
+            "options": [
+                "Cannon",
+                "Tornado",
+                "Poison",
+                "Mini PEKKA"
+            ],
+            "answer": 2
+        },
+        {
+            "id": 5,
+            "question": "What's the best way to defend against a Balloon + Lumberjack combo?",
+            "options": [
+                "Use only buildings",
+                "Fireball the Balloon only",
+                "Use Rocket on both",
+                "Combine air-targeting troops with buildings or spells"
+            ],
+            "answer": 3
+        }
+    ]
+}
 
+# User data storage - in a real app with multiple users, 
+# this would be stored in a database with user sessions
+user_data = {
+    'started': False,
+    'current_lesson': 0,
+    'lesson_times': {},
+    'quiz_answers': {},
+    'quiz_start_time': None,
+    'results': None
+}
 
 @app.route('/')
 def home():
