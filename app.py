@@ -12,7 +12,7 @@ clash_data = {
             "id": 1,
             "title": "Hog Rider",
             "description": "The Hog Rider is a fast-moving troop that targets buildings. It's a popular win condition in many decks.",
-            "image_url": "https://cdn.royaleapi.com/static/img/cards-75/hog-rider.png",
+            "image_url": "https://theriagames.com/wp-content/uploads/2025/02/Hog_Rider_card_render.webp",
             "counters": [
                 "Buildings like Cannon or Tesla",
                 "Tornado to activate King Tower",
@@ -25,7 +25,7 @@ clash_data = {
             "id": 2,
             "title": "Balloon",
             "description": "The Balloon is a flying troop that does massive damage to buildings. It's deadly if it reaches the tower.",
-            "image_url": "https://cdn.royaleapi.com/static/img/cards-75/balloon.png",
+            "image_url": "https://preview.redd.it/f3ycjy98rsk81.png?width=1080&format=png&auto=webp&s=4b487a8543914fe9f1091cc1ecfb2eb65632059d",
             "counters": [
                 "Air targeting troops like Musketeer",
                 "Buildings to distract",
