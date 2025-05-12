@@ -1,8 +1,25 @@
-from flask import Flask, render_template, request, redirect, url_for
-import datetime
-import json
+# app.py
+# Main Flask app for Clash Royale Learning App
+# Follows project spec: modular, simple, session-based, well-commented
+
+from flask import Flask, render_template, session, redirect, url_for, request
+from lessons import lessons
+from quizzes import quiz_questions
+from datetime import datetime
 
 app = Flask(__name__)
+app.secret_key = "replace-this-with-a-very-secret-key-123"
+
+def log_interaction(action, item_id):
+    # Simple logger: store logs in session
+    if 'button_logs' not in session:
+        session['button_logs'] = []
+    session['button_logs'].append({
+        'button': action,
+        'context': item_id,
+        'timestamp': datetime.now().isoformat()
+    })
+    session.modified = True
 
 # Data for learning and quiz content - in a real app, this might come from a database
 # Clash Royale win conditions and their counters
@@ -12,7 +29,7 @@ clash_data = {
             "id": 1,
             "title": "Hog Rider",
             "description": "The Hog Rider is a fast-moving troop that targets buildings. It's a popular win condition in many decks.",
-            "image_url": "https://theriagames.com/wp-content/uploads/2025/02/Hog_Rider_card_render.webp",
+            "image_url": "https://cdn.royaleapi.com/static/img/cards-75/hog-rider.png",
             "counters": [
                 "Buildings like Cannon or Tesla",
                 "Tornado to activate King Tower",
@@ -25,7 +42,7 @@ clash_data = {
             "id": 2,
             "title": "Balloon",
             "description": "The Balloon is a flying troop that does massive damage to buildings. It's deadly if it reaches the tower.",
-            "image_url": "https://preview.redd.it/f3ycjy98rsk81.png?width=1080&format=png&auto=webp&s=4b487a8543914fe9f1091cc1ecfb2eb65632059d",
+            "image_url": "https://cdn.royaleapi.com/static/img/cards-75/balloon.png",
             "counters": [
                 "Air targeting troops like Musketeer",
                 "Buildings to distract",
@@ -120,99 +137,144 @@ user_data = {
 
 @app.route('/')
 def home():
-    # Reset user data when returning to home
-    user_data['started'] = False
-    user_data['current_lesson'] = 0
-    user_data['lesson_times'] = {}
-    user_data['quiz_answers'] = {}
-    user_data['quiz_start_time'] = None
-    user_data['results'] = None
+    """Home page with Start Learning button."""
+    # Reset both lesson and quiz progress when visiting home page
+    session['lesson_progress'] = 0
+    session['quiz_idx'] = 0
+    session['quiz_answers'] = [None] * len(quiz_questions)
     return render_template('home.html')
 
-@app.route('/start')
-def start():
-    # Record when the user starts the learning process
-    user_data['started'] = True
-    user_data['start_time'] = datetime.datetime.now().isoformat()
-    return redirect(url_for('learn', lesson_id=1))
 
-@app.route('/learn/<int:lesson_id>')
-def learn(lesson_id):
-    # Check if user has started the app
-    if not user_data['started']:
-        return redirect(url_for('home'))
-    
-    # Record time spent on this lesson
-    user_data['current_lesson'] = lesson_id
-    user_data['lesson_times'][str(lesson_id)] = datetime.datetime.now().isoformat()
-    
-    # Get lesson data
-    lesson = next((l for l in clash_data['lessons'] if l['id'] == lesson_id), None)
-    if not lesson:
-        return redirect(url_for('quiz', question_id=1))
-    
-    # Check if there's a next lesson
-    next_lesson = next((l for l in clash_data['lessons'] if l['id'] == lesson_id + 1), None)
-    next_url = url_for('learn', lesson_id=lesson_id + 1) if next_lesson else url_for('quiz', question_id=1)
-    
-    return render_template('learn.html', lesson=lesson, next_url=next_url)
+@app.route('/play')
+def play():
+    """Interactive Clash Royale game simulation with cards from lessons."""
+    # Get all unique cards from lessons
+    cards = set()
+    counters = set()
 
-@app.route('/quiz/<int:question_id>', methods=['GET', 'POST'])
-def quiz(question_id):
-    # Check if user has started the app
-    if not user_data['started']:
-        return redirect(url_for('home'))
-    
-    # Handle form submission
+    for lesson in lessons:
+        counters.update(lesson['counters'])
+
+    # Add commonly used cards
+    cards = list(counters)
+    cards.extend(['Hog Rider', 'Mega Knight', 'Golem',
+                 'Lava Hound', 'Elite Barbarians'])
+
+    # Remove duplicates while preserving order
+    unique_cards = []
+    for card in cards:
+        if card not in unique_cards:
+            unique_cards.append(card)
+
+    return render_template('play.html', cards=unique_cards)
+
+
+@app.route('/lesson', methods=['GET', 'POST'])
+def lesson():
+    """Lesson navigation and display."""
+    # Reset quiz progress when coming from another section
+    if request.referrer and '/quiz' in request.referrer:
+        session['quiz_idx'] = 0
+        session['quiz_answers'] = [None] * len(quiz_questions)
+
+    # Initialize or get current lesson progress
+    if 'lesson_progress' not in session or request.args.get('reset'):
+        session['lesson_progress'] = 0
+    idx = session['lesson_progress']
+
+    # Handle navigation
     if request.method == 'POST':
-        selected_option = int(request.form.get('answer', -1))
-        user_data['quiz_answers'][str(question_id)] = selected_option
-        
-        # Redirect to next question or results
-        next_question = next((q for q in clash_data['quiz'] if q['id'] == question_id + 1), None)
-        if next_question:
-            return redirect(url_for('quiz', question_id=question_id + 1))
-        else:
-            return redirect(url_for('results'))
-    
-    # GET request handling
-    question = next((q for q in clash_data['quiz'] if q['id'] == question_id), None)
-    if not question:
-        return redirect(url_for('results'))
-    
-    # Record start time for the quiz if this is the first question
-    if question_id == 1 and not user_data['quiz_start_time']:
-        user_data['quiz_start_time'] = datetime.datetime.now().isoformat()
-    
-    total_questions = len(clash_data['quiz'])
-    return render_template('quiz.html', question=question, question_id=question_id, total_questions=total_questions)
+        action = request.form.get('action')
+        if action == 'next' and idx < len(lessons) - 1:
+            idx += 1
+        elif action == 'prev' and idx > 0:
+            idx -= 1
+        session['lesson_progress'] = idx
+        log_interaction(action, lessons[idx]['id'])
+    lesson = lessons[idx]
+    progress = (idx + 1, len(lessons))
+    return render_template('lesson.html', lesson=lesson, progress=progress)
 
-@app.route('/results')
-def results():
-    # Check if user has started the app
-    if not user_data['started']:
-        return redirect(url_for('home'))
-    
-    # Calculate score
-    correct_answers = 0
-    quiz_data = clash_data['quiz']
-    
-    for question in quiz_data:
-        question_id = str(question['id'])
-        if question_id in user_data['quiz_answers']:
-            user_answer = user_data['quiz_answers'][question_id]
-            if user_answer == question['answer']:
-                correct_answers += 1
-    
-    score = {
-        'correct': correct_answers,
-        'total': len(quiz_data),
-        'percentage': int((correct_answers / len(quiz_data)) * 100) if quiz_data else 0
-    }
-    
-    user_data['results'] = score
-    
-    return render_template('results.html', score=score)
+
+@app.route('/certificate')
+def certificate():
+    """Show a certificate of completion after finishing the quiz."""
+    # Calculate quiz score based on correct answers
+    quiz_answers = session.get('quiz_answers', [None] * len(quiz_questions))
+    correct_count = 0
+    for i, answer in enumerate(quiz_answers):
+        if answer is not None and answer == quiz_questions[i]['correct_answer_index']:
+            correct_count += 1
+
+    # Calculate percentage score (avoid division by zero)
+    total_questions = len(quiz_questions)
+    quiz_score = round((correct_count / total_questions)
+                       * 100) if total_questions > 0 else 0
+
+    return render_template('certificate.html', quiz_score=quiz_score)
+
+
+@app.route('/quiz', methods=['GET', 'POST'])
+def quiz():
+    """Quiz navigation and answering."""
+    # Reset lesson progress when coming from another section
+    if request.referrer and '/lesson' in request.referrer:
+        session['lesson_progress'] = 0
+
+    # Initialize or reset quiz progress
+    if 'quiz_idx' not in session or request.args.get('reset'):
+        session['quiz_idx'] = 0
+    # Ensure quiz_answers always matches the number of quiz questions
+    if 'quiz_answers' not in session or len(session['quiz_answers']) != len(quiz_questions) or request.args.get('reset'):
+        session['quiz_answers'] = [None] * len(quiz_questions)
+    idx = session['quiz_idx']
+    feedback = None
+    # Handle answer submission
+    if request.method == 'POST':
+        action = request.form.get('action')
+        if action in ['next', 'prev']:
+            if action == 'next':
+                if idx < len(quiz_questions) - 1:
+                    idx += 1
+                elif idx == len(quiz_questions) - 1:
+                    # User clicked Next on the last question, redirect to certificate
+                    return redirect(url_for('certificate'))
+            elif action == 'prev' and idx > 0:
+                idx -= 1
+            session['quiz_idx'] = idx
+            log_interaction(action, quiz_questions[idx]['id'])
+        elif action == 'answer':
+            selected = request.form.get('option')
+            if selected is not None:
+                # Store the answer in session
+                session['quiz_answers'][idx] = int(selected)
+                session.modified = True  # Ensure session is saved
+                log_interaction('answer', quiz_questions[idx]['id'])
+                # Just redirect back to the same question to refresh
+                return redirect(url_for('quiz'))
+
+    progress = (idx + 1, len(quiz_questions))  # Always set before rendering
+    question = quiz_questions[idx]
+    answer = session['quiz_answers'][idx]
+
+    # Check if the current answer is correct to enable the Next button
+    is_correct = False
+    if answer is not None:
+        is_correct = (answer == question['correct_answer_index'])
+
+    return render_template('quiz.html', question=question, answer=answer, feedback=feedback,
+                           progress=progress, is_correct=is_correct)
+
+
+@app.route('/interactions')
+def interactions():
+    """Show user interaction logs and summary stats."""
+    logs = session.get('button_logs', [])
+    total_clicks = len(logs)
+    unique_buttons = len(set(log['button'] for log in logs))
+    pages_visited = len(set(log['context'] for log in logs))
+    return render_template('interactions.html', logs=logs, total_clicks=total_clicks, unique_buttons=unique_buttons, pages_visited=pages_visited)
+
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000) 
+    app.run(debug=True)

@@ -1,117 +1,185 @@
-{% extends "base.html" %} {% block title %}Quiz: Question {{ question_id }} -
-Clash Royale Counter Guide{% endblock %} {% block content %}
-<div class="row">
-  <div class="col-12">
-    <nav aria-label="breadcrumb">
-      <ol class="breadcrumb">
-        <li class="breadcrumb-item">
-          <a href="{{ url_for('home') }}">Home</a>
-        </li>
-        <li class="breadcrumb-item active">
-          Quiz - Question {{ question_id }}
-        </li>
-      </ol>
-    </nav>
-
-    <div class="progress mb-3">
-      <div
-        class="progress-bar bg-success"
-        role="progressbar"
-        style="width: {{ (question_id / total_questions) * 100 }}%;"
-        aria-valuenow="{{ question_id }}"
-        aria-valuemin="0"
-        aria-valuemax="{{ total_questions }}"
+{% extends 'base.html' %} {% block content %}
+<!-- Quiz page content -->
+<div
+  class="card mx-auto"
+  style="max-width: 500px"
+>
+  <div class="card-body">
+    <h2
+      class="card-title mb-3"
+      style="font-size: 2rem; font-weight: 600"
+    >
+      Quiz
+    </h2>
+    <p
+      class="fw-bold mb-4"
+      style="font-size: 1.1rem"
+    >
+      {{ question.question }}
+    </p>
+    <!-- Optional GIF/Video placeholder -->
+    {% if question.media_placeholders.gif and question.media_placeholders.gif != '/static/placeholder.gif' %}
+      {% if question.media_placeholders.gif.endswith('.mp4') %}
+      <!-- Render video if URL is mp4 -->
+      <video
+        src="{{ question.media_placeholders.gif }}"
+        class="img-fluid rounded shadow-sm mb-3"
+        controls
+        loop
+        muted
+        playsinline
+        style="max-width: 100%; height: auto; background: #f3f4f6"
       >
-        Question {{ question_id }}/{{ total_questions }}
-      </div>
+        Your browser does not support the video tag.
+      </video>
+      {% else %}
+      <!-- Render image if URL is gif or other -->
+      <img
+        src="{{ question.media_placeholders.gif }}"
+        class="img-fluid rounded shadow-sm mb-3"
+        alt="GIF/Video coming soon!"
+        style="max-height: 220px; object-fit: contain; background: #f3f4f6"
+      />
+      {% endif %}
+    {% endif %}
+    <hr class="my-4" />
+    <!-- Interactive Board for All Quiz Questions -->
+    <p class="text-center mb-2" style="font-size: 1.1rem; color: #555;">
+      <i class="bi bi-hand-index"></i> Drag the correct card to the middle
+    </p>
+    <div
+      id="cr-board"
+      class="mb-4 position-relative"
+      style="
+        width: 100%;
+        max-width: 420px;
+        height: 220px;
+        margin: auto;
+        background: #e3e6ed
+          url('https://cdna.artstation.com/p/assets/images/images/065/028/730/large/anit-pednekar-r2.jpg?1689324569')
+          center center/cover no-repeat;
+        border-radius: 16px;
+        box-shadow: 0 2px 8px #0001;
+        overflow: hidden;
+      "
+    >
+      <!-- Glowy drop zone -->
+      <div
+        id="drop-zone"
+        style="
+          position: absolute;
+          left: 170px;
+          top: 80px;
+          width: 80px;
+          height: 80px;
+          border-radius: 50%;
+          background: radial-gradient(circle, #ffe066 60%, #fff0 100%);
+          box-shadow: 0 0 24px 8px #ffe06688;
+          z-index: 2;
+        "
+      ></div>
     </div>
-
-    <div class="card mb-4 shadow">
-      <div class="card-header bg-success text-white">
-        <h2 class="my-2">Quiz: Question {{ question_id }}</h2>
-      </div>
-      <div class="card-body">
-        <form
-          method="POST"
-          id="quiz-form"
+    <div class="d-flex flex-wrap justify-content-center gap-3 mb-4">
+      {% for card in question.options %}
+      <div
+        class="draggable-card"
+        draggable="true"
+        data-idx="{{ loop.index0 }}"
+        style="width: 100px; cursor: grab"
+      >
+        <img
+          src="/static/images/{{ card|lower|replace(' ','_') }}.png"
+          alt="{{ card }}"
+          class="img-fluid rounded shadow-sm"
+          style="background: #fff; object-fit: contain; max-height: 80px"
+        />
+        <div
+          class="text-center mt-1"
+          style="font-size: 0.95rem; font-weight: 500"
         >
-          <div class="mb-4">
-            <h4 class="mb-3">{{ question.question }}</h4>
-
-            {% for option in question.options %}
-            <div class="form-check mb-2">
-              <input
-                class="form-check-input"
-                type="radio"
-                name="answer"
-                id="option{{ loop.index0 }}"
-                value="{{ loop.index0 }}"
-                required
-              />
-              <label
-                class="form-check-label"
-                for="option{{ loop.index0 }}"
-              >
-                {{ option }}
-              </label>
-            </div>
-            {% endfor %}
-          </div>
-
-          <div class="d-flex justify-content-between">
-            {% if question_id > 1 %}
-            <a
-              href="{{ url_for('quiz', question_id=question_id - 1) }}"
-              class="btn btn-outline-secondary"
-            >
-              <i class="bi bi-arrow-left"></i> Previous Question
-            </a>
-            {% else %}
-            <a
-              href="{{ url_for('learn', lesson_id=3) }}"
-              class="btn btn-outline-secondary"
-            >
-              <i class="bi bi-arrow-left"></i> Back to Lessons
-            </a>
-            {% endif %}
-
-            <button
-              type="submit"
-              class="btn btn-success"
-              id="submit-answer"
-            >
-              {% if question_id == total_questions %} Submit Quiz
-              <i class="bi bi-check-circle"></i> {% else %} Next Question
-              <i class="bi bi-arrow-right"></i>
-              {% endif %}
-            </button>
-          </div>
-        </form>
+          {{ card }}
+        </div>
+        <div class="text-center text-muted" style="font-size: 0.75rem; line-height: 1.1;">
+          {{ question.card_descriptions[card] if question.card_descriptions and card in question.card_descriptions else "" }}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <div
+      id="drag-feedback"
+      class="mb-3"
+    ></div>
+    <!-- Hidden form to submit the answer -->
+    <form id="answer-form" method="post" style="display:none;">
+      <input type="hidden" name="action" value="answer">
+      <input type="hidden" id="selected-option" name="option" value="">
+    </form>
+    <div class="d-flex justify-content-between gap-2 mt-2">
+      <!-- Navigation buttons for quiz -->
+      <form method="post" style="display:inline;">
+        <button type="submit" name="action" value="prev" class="btn btn-secondary px-4 py-2" aria-label="Previous Question" {% if progress[0] == 1 %}disabled{% endif %}>Previous</button>
+      </form>
+      <form method="post" style="display:inline;">
+        <button id="next-btn" type="submit" name="action" value="next" class="btn btn-primary px-4 py-2" aria-label="Next Question" {% if not is_correct %}disabled{% endif %}>{% if progress[0] == progress[1] %}Finish Quiz{% else %}Next{% endif %}</button>
+      </form>
+    </div>
+    <script>
+      // Simple drag-and-drop logic for all questions
+      const dropZone = document.getElementById('drop-zone');
+      const cards = document.querySelectorAll('.draggable-card');
+      let correctIdx = {{ question.correct_answer_index }};
+      let feedback = document.getElementById('drag-feedback');
+      let nextBtn = document.getElementById('next-btn');
+      let answeredCorrectly = {% if is_correct %}true{% else %}false{% endif %};
+      const answerForm = document.getElementById('answer-form');
+      const selectedOption = document.getElementById('selected-option');
+      
+      // Display feedback based on previous answer
+      {% if answer is not none %}
+        {% if is_correct %}
+          feedback.innerHTML = '<div class="alert alert-success">Correct!</div>';
+        {% else %}
+          feedback.innerHTML = '<div class="alert alert-danger">Incorrect. Try dragging the correct card!</div>';
+        {% endif %}
+      {% endif %}
+      
+      cards.forEach(card => {
+        card.addEventListener('dragstart', e => {
+          e.dataTransfer.setData('text/plain', card.dataset.idx);
+        });
+      });
+      dropZone.addEventListener('dragover', e => {
+        e.preventDefault();
+        dropZone.style.boxShadow = '0 0 32px 16px #ffe066cc';
+      });
+      dropZone.addEventListener('dragleave', e => {
+        dropZone.style.boxShadow = '0 0 24px 8px #ffe06688';
+      });
+      dropZone.addEventListener('drop', e => {
+        e.preventDefault();
+        dropZone.style.boxShadow = '0 0 24px 8px #ffe06688';
+        let idx = parseInt(e.dataTransfer.getData('text/plain'));
+        // Always save the selected answer to session
+        selectedOption.value = idx;
+        answerForm.submit();
+      });
+    </script>
+    <!-- Progress bar -->
+    <div
+      class="progress my-4"
+      aria-label="Quiz progress"
+    >
+      <div
+        class="progress-bar bg-primary"
+        role="progressbar"
+        style="width: {{ (progress[0] / progress[1]) * 100 }}%;"
+        aria-valuenow="{{ progress[0] }}"
+        aria-valuemin="1"
+        aria-valuemax="{{ progress[1] }}"
+      >
+        Question {{ progress[0] }} / {{ progress[1] }}
       </div>
     </div>
   </div>
 </div>
-{% endblock %} {% block scripts %}
-<script>
-  // Record user quiz interactions
-  $(document).ready(function () {
-    console.log(
-      "Quiz question {{ question_id }} viewed at: " + new Date().toISOString()
-    );
-
-    // Track answer selection
-    $('input[name="answer"]').change(function () {
-      const selectedOption = $('input[name="answer"]:checked').val();
-      console.log("Selected option: " + selectedOption);
-    });
-
-    // Track form submission
-    $("#quiz-form").submit(function () {
-      const selectedOption = $('input[name="answer"]:checked').val();
-      console.log(
-        "Submitted answer for question {{ question_id }}: " + selectedOption
-      );
-    });
-  });
-</script>
 {% endblock %}
